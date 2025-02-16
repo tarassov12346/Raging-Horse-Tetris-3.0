@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * application instance, and it does not support all of the features a
          * full message broker like RabbitMQ, ActiveMQ, etc... provide.
          */
-        registry.enableSimpleBroker("/topic");
+        registry.enableSimpleBroker("/receive");
         /*
          * The application destination prefix `/app` designates the broker to send
          * messages prefixed with `/app` to our `@MessageMapping`s.
