@@ -1,6 +1,6 @@
-package com.example.demoWebsocket.service;
+package com.app.game.tetris.service;
 
-import com.example.demoWebsocket.model.Tetramino;
+import com.app.game.tetris.model.Tetramino;
 
 public interface GameLogic <T>{
     int WIDTH = 12;

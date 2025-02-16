@@ -1,7 +1,7 @@
-package com.example.demoWebsocket.service;
+package com.app.game.tetris.service;
 
-import com.example.demoWebsocket.model.Game;
-import com.example.demoWebsocket.serviceImpl.State;
+import com.app.game.tetris.model.Game;
+import com.app.game.tetris.serviceImpl.State;
 
 import java.util.Optional;
 

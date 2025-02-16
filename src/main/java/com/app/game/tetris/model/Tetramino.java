@@ -1,4 +1,4 @@
-package com.example.demoWebsocket.model;
+package com.app.game.tetris.model;
 
 import lombok.Value;
 import org.springframework.stereotype.Component;

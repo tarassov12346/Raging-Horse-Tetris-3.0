@@ -1,4 +1,4 @@
-package com.example.demoWebsocket.configuration;
+package com.app.game.tetris.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

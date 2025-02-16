@@ -1,9 +1,9 @@
-package com.example.demoWebsocket.serviceImpl;
+package com.app.game.tetris.serviceImpl;
 
-import com.example.demoWebsocket.model.Game;
-import com.example.demoWebsocket.model.Tetramino;
-import com.example.demoWebsocket.service.GameLogic;
-import com.example.demoWebsocket.service.StateService;
+import com.app.game.tetris.model.Game;
+import com.app.game.tetris.model.Tetramino;
+import com.app.game.tetris.service.GameLogic;
+import com.app.game.tetris.service.StateService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

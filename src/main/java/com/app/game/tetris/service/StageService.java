@@ -1,7 +1,7 @@
-package com.example.demoWebsocket.service;
+package com.app.game.tetris.service;
 
-import com.example.demoWebsocket.model.Tetramino;
-import com.example.demoWebsocket.serviceImpl.Stage;
+import com.app.game.tetris.model.Tetramino;
+import com.app.game.tetris.serviceImpl.Stage;
 
 public interface StageService extends GameLogic<Stage>{
     Stage buildStage(char[][] cells, Tetramino tetramino, int tetraminoX, int tetraminoY, int collapsedLayersCount);

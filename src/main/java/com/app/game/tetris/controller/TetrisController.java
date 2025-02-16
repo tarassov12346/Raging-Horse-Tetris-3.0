@@ -1,7 +1,7 @@
-package com.example.demoWebsocket.controller;
+package com.app.game.tetris.controller;
 
-import com.example.demoWebsocket.service.PlayGameService;
-import com.example.demoWebsocket.serviceImpl.State;
+import com.app.game.tetris.service.PlayGameService;
+import com.app.game.tetris.serviceImpl.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
