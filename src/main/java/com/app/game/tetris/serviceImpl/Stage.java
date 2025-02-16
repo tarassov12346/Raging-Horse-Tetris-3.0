@@ -49,24 +49,24 @@ public class Stage implements StageService {
 
     @Override
     public Stage moveLeft() {
-        return new Stage(cells, tetramino, tetraminoX - 1, tetraminoY, collapsedLayersCount);
+        return buildStage(cells, tetramino, tetraminoX - 1, tetraminoY, collapsedLayersCount);
     }
 
     @Override
     public Stage moveRight() {
-        return new Stage(cells, tetramino, tetraminoX + 1, tetraminoY, collapsedLayersCount);
+        return buildStage(cells, tetramino, tetraminoX + 1, tetraminoY, collapsedLayersCount);
     }
 
     @Override
     public Stage moveDown(int step) {
         if (pause.toString().equals("go!"))
-            return new Stage(cells, tetramino, tetraminoX, tetraminoY + step, collapsedLayersCount);
-        else return new Stage(cells, tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
+            return buildStage(cells, tetramino, tetraminoX, tetraminoY + step, collapsedLayersCount);
+        else return buildStage(cells, tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
     }
 
     @Override
     public Stage rotate() {
-        return new Stage(cells, tetramino.buildTetramino(rotateMatrix(tetramino.getShape())), tetraminoX, tetraminoY, collapsedLayersCount);
+        return buildStage(cells, tetramino.buildTetramino(rotateMatrix(tetramino.getShape())), tetraminoX, tetraminoY, collapsedLayersCount);
     }
 
     @Override
@@ -83,12 +83,12 @@ public class Stage implements StageService {
 
     @Override
     public Stage setTetramino(Tetramino tetramino, int x, int y) {
-        return new Stage(cells, tetramino, x, y, collapsedLayersCount);
+        return buildStage(cells, tetramino, x, y, collapsedLayersCount);
     }
 
     @Override
     public Stage addTetramino() {
-        return new Stage(drawTetraminoOnCells(), tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
+        return buildStage(drawTetraminoOnCells(), tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class Stage implements StageService {
                 ny2[0]++;
             }
         });
-        return new Stage(c, tetramino, tetraminoX, tetraminoY, collapsedLayersCount + ny2[0]);
+        return buildStage(c, tetramino, tetraminoX, tetraminoY, collapsedLayersCount + ny2[0]);
     }
 
     @Override

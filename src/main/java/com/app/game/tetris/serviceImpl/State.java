@@ -94,17 +94,17 @@ public class State implements StateService {
 
     @Override
     public Optional<State> setTetramino(Tetramino tetramino, int x, int y) {
-        return Optional.of(new State(stage.setTetramino(tetramino, x, y), isRunning, game));
+        return Optional.of(buildState(stage.setTetramino(tetramino, x, y), isRunning, game));
     }
 
     @Override
     public Optional<State> addTetramino() {
-        return Optional.of(new State(stage.addTetramino(), isRunning, game));
+        return Optional.of(buildState(stage.addTetramino(), isRunning, game));
     }
 
     @Override
     public Optional<State> collapseFilledLayers() {
-        return Optional.of(new State(stage.collapseFilledLayers(), isRunning, game));
+        return Optional.of(buildState(stage.collapseFilledLayers(), isRunning, game));
     }
 
     @Override
@@ -113,11 +113,11 @@ public class State implements StateService {
     }
 
     public State start() {
-        return new State(stage, true, game);
+        return buildState(stage, true, game);
     }
 
     public State stop() {
-        return new State(stage, false, game);
+        return buildState(stage, false, game);
     }
 
     public Optional<State> createStateWithNewTetramino() {
@@ -162,19 +162,19 @@ public class State implements StateService {
     }
 
     private State moveTetraminoDown(int yToMoveDown) {
-        return new State(stage.moveDown(yToMoveDown), isRunning, game);
+        return buildState(stage.moveDown(yToMoveDown), isRunning, game);
     }
 
     private State moveTetraminoLeft() {
-        return new State(stage.moveLeft(), isRunning, game);
+        return buildState(stage.moveLeft(), isRunning, game);
     }
 
     private State moveTetraminoRight() {
-        return new State(stage.moveRight(), isRunning, game);
+        return buildState(stage.moveRight(), isRunning, game);
     }
 
     private State rotateTetramino() {
-        return new State(stage.rotate(), isRunning, game);
+        return buildState(stage.rotate(), isRunning, game);
     }
 
     private Tetramino getRandomTetramino() {
