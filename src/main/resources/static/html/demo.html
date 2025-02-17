@@ -122,7 +122,10 @@
             $("#tetrisSpeedBox").text('TETRIS at speed ' + speed);
 
            if (status) $("#gameStatusBox").text('Game status: ON');
-           else $("#gameStatusBox").text('Game status: OVER');
+           else {
+           $("#gameStatusBox").text('Game status: OVER');
+           playSound('registered_sound');
+           }
 
 
 
@@ -594,6 +597,13 @@
 <audio id="snap_sound">
     <source  src="http://localhost:8080/sounds/snap.mp3" type="audio/mpeg"></source>
     <source  src="http://localhost:8080/sounds/snap.ogg" type="audio/ogg"></source>
+
+    <audio id="registered_sound">
+        <source  src="http://localhost:8080/sounds/registered.mp3" type="audio/mpeg"></source>
+        <source  src="http://localhost:8080/sounds/registered.ogg" type="audio/ogg"></source>
+    </audio>
+
+
 </audio>
 </body>
 </html>

@@ -32,6 +32,45 @@ public class Stage implements StageService {
         return new Stage(cells, tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
     }
 
+    public Stage buildStage(char[][] cells){
+        return buildStage(cells,tetramino,tetraminoX,tetraminoY,collapsedLayersCount);
+    }
+
+    public char[][] getCells() {
+        return cells;
+    }
+
+    public void setCells(char[][] cells) {
+        this.cells = cells;
+    }
+
+    public Tetramino getTetramino() {
+        return tetramino;
+    }
+
+    public int getTetraminoX() {
+        return tetraminoX;
+    }
+
+    public int getTetraminoY() {
+        return tetraminoY;
+    }
+
+    public int getCollapsedLayersCount() {
+        return collapsedLayersCount;
+    }
+
+    public char[][] drawTetraminoOnCells() {
+        //  final char[][] c = Arrays.stream(cells).map(char[]::clone).toArray(char[][]::new); // copy
+        final char[][] c = Arrays.stream(cells).map(char[]::clone).toArray(char[][]::new); // copy
+        IntStream.range(0, tetramino.getShape().length).forEach(y ->
+                IntStream.range(0, tetramino.getShape()[0].length).forEach(x -> {
+                    if (tetramino.getShape()[y][x] != '0')
+                        c[tetraminoY + y][tetraminoX + x] = tetramino.getShape()[y][x];
+                }));
+        return c;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -82,12 +121,12 @@ public class Stage implements StageService {
     }
 
     @Override
-    public Stage setTetramino(Tetramino tetramino, int x, int y) {
+    public Stage initiateTetramino(Tetramino tetramino, int x, int y) {
         return buildStage(cells, tetramino, x, y, collapsedLayersCount);
     }
 
     @Override
-    public Stage addTetramino() {
+    public Stage burryTetramino() {
         return buildStage(drawTetraminoOnCells(), tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
     }
 
@@ -119,37 +158,6 @@ public class Stage implements StageService {
         )));
     }
 
-    public char[][] drawTetraminoOnCells() {
-        //  final char[][] c = Arrays.stream(cells).map(char[]::clone).toArray(char[][]::new); // copy
-        final char[][] c = Arrays.stream(cells).map(char[]::clone).toArray(char[][]::new); // copy
-        IntStream.range(0, tetramino.getShape().length).forEach(y ->
-                IntStream.range(0, tetramino.getShape()[0].length).forEach(x -> {
-                    if (tetramino.getShape()[y][x] != '0')
-                        c[tetraminoY + y][tetraminoX + x] = tetramino.getShape()[y][x];
-                }));
-        return c;
-    }
-
-    public char[][] getCells() {
-        return cells;
-    }
-
-    public Tetramino getTetramino() {
-        return tetramino;
-    }
-
-    public int getTetraminoX() {
-        return tetraminoX;
-    }
-
-    public int getTetraminoY() {
-        return tetraminoY;
-    }
-
-    public int getCollapsedLayersCount() {
-        return collapsedLayersCount;
-    }
-
     private char[][] rotateMatrix(char[][] m) {
         final int h = m.length;
         final int w = m[0].length;
@@ -162,11 +170,4 @@ public class Stage implements StageService {
         return IntStream.range(0, row.length).noneMatch(i -> row[i] == '0');
     }
 
-    public void setCells(char[][] cells) {
-        this.cells = cells;
-    }
-
-    public Stage setStage(char[][] cells){
-        return buildStage(cells,tetramino,tetraminoX,tetraminoY,collapsedLayersCount);
-    }
 }

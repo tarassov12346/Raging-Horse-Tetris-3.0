@@ -5,6 +5,7 @@ import com.app.game.tetris.serviceImpl.Stage;
 
 public interface StageService extends GameLogic<Stage>{
     Stage buildStage(char[][] cells, Tetramino tetramino, int tetraminoX, int tetraminoY, int collapsedLayersCount);
+    Stage buildStage(char[][] cells);
     char[][] drawTetraminoOnCells();
     char[][] getCells();
     Tetramino getTetramino();

@@ -93,13 +93,13 @@ public class State implements StateService {
     }
 
     @Override
-    public Optional<State> setTetramino(Tetramino tetramino, int x, int y) {
-        return Optional.of(buildState(stage.setTetramino(tetramino, x, y), isRunning, game));
+    public Optional<State> initiateTetramino(Tetramino tetramino, int x, int y) {
+        return Optional.of(buildState(stage.initiateTetramino(tetramino, x, y), isRunning, game));
     }
 
     @Override
-    public Optional<State> addTetramino() {
-        return Optional.of(buildState(stage.addTetramino(), isRunning, game));
+    public Optional<State> burryTetramino() {
+        return Optional.of(buildState(stage.burryTetramino(), isRunning, game));
     }
 
     @Override
@@ -122,17 +122,17 @@ public class State implements StateService {
 
     public Optional<State> createStateWithNewTetramino() {
         final Tetramino t = getRandomTetramino();
-        final State newState = addTetramino().orElse(this)
+        final State newState = burryTetramino().orElse(this)
                 .collapseFilledLayers().orElse(this)
                 .updatePlayerScore()
-                .setTetramino(t, (GameLogic.WIDTH - t.getShape().length) / 2, 0).orElse(this);
+                .initiateTetramino(t, (GameLogic.WIDTH - t.getShape().length) / 2, 0).orElse(this);
         return !newState.checkCollision(0, 0, false) ? Optional.of(newState) : Optional.empty();
     }
 
     public Optional<State> restartWithNewTetramino() {
         final Tetramino t = getRandomTetramino();
-        final State newState = addTetramino().orElse(this)
-                .setTetramino(t, (GameLogic.WIDTH - t.getShape().length) / 2, 0).orElse(this);
+        final State newState = burryTetramino().orElse(this)
+                .initiateTetramino(t, (GameLogic.WIDTH - t.getShape().length) / 2, 0).orElse(this);
         return !newState.checkCollision(0, 0, false) ? Optional.of(newState) : Optional.empty();
     }
 

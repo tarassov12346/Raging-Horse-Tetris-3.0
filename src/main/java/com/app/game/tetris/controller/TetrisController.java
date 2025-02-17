@@ -3,6 +3,7 @@ package com.app.game.tetris.controller;
 import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -23,51 +24,47 @@ public class TetrisController {
     @Autowired
     private SimpMessagingTemplate template;
 
-    @MessageMapping("/start")
-    public void gamePlayDown(){
-        state=playGameService.initiateState("USERTEST");
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-        service.scheduleAtFixedRate(() -> state=sendState(state), 0, 1000, TimeUnit.MILLISECONDS);
+    @MessageMapping("/{moveId}")
+    public void gamePlayDown(@DestinationVariable String moveId) {
+        switch (moveId) {
+            case "start" -> {
+                state = playGameService.initiateState("USERTEST");
+                ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+                service.scheduleAtFixedRate(() -> state = sendStateToBeDisplayed(state), 0, 1000, TimeUnit.MILLISECONDS);
+            }
+            case "1" -> {
+                state = playGameService.rotateState(state);
+                state = sendStateToBeDisplayed(state);
+            }
+            case "2" -> {
+                state = playGameService.moveLeftState(state);
+                state = sendStateToBeDisplayed(state);
+            }
+            case "3" -> {
+                state = playGameService.moveRightState(state);
+                state = sendStateToBeDisplayed(state);
+            }
+            case "4" -> {
+                state = playGameService.dropDownState(state);
+                state = sendStateToBeDisplayed(state);
+            }
+        }
     }
 
-    @MessageMapping({"/1"})
-    public void gamePlayRotate(){
-        state = playGameService.rotateState(state);
-        state=sendState(state);
+    private State sendStateToBeDisplayed(State state) {
+        state = createStateAfterMoveDown(state);
+        char[][] cellsToBeDisplayed = state.getStage().drawTetraminoOnCells();
+        State stateToBeSent = state.buildState(state.getStage().buildStage(cellsToBeDisplayed), state.isRunning(), state.getGame());
+        this.template.convertAndSend("/receive/stateObjects", stateToBeSent);
+        return state;
     }
 
-    @MessageMapping({"/2"})
-    public void gamePlayLeft(){
-        state = playGameService.moveLeftState(state);
-        state=sendState(state);
-    }
-
-    @MessageMapping({"/3"})
-    public void gamePlayRight(){
-        state = playGameService.moveRightState(state);
-        state=sendState(state);
-    }
-
-    @MessageMapping({"/4"})
-    public void gamePlayDropDown(){
-        state = playGameService.dropDownState(state);
-        state=sendState(state);
-    }
-
-    private State sendState(State state) {
-        state = moveDownState(state);
-        char[][] cells = state.getStage().drawTetraminoOnCells();
-        State stateSend= state.buildState(state.getStage().setStage(cells), state.isRunning(), state.getGame());
-        this.template.convertAndSend("/receive/stateObjects",stateSend);
-        return  state;
-    }
-
-    private State moveDownState(State state){
+    private State createStateAfterMoveDown(State state) {
         Optional<State> moveDownState = playGameService.moveDownState(state);
         if (moveDownState.isEmpty()) {
             Optional<State> newTetraminoState = playGameService.newTetraminoState(state);
             if (newTetraminoState.isEmpty()) {
-                state=state.stop();
+                state = state.stop();
                 return state;
             } else state = newTetraminoState.orElse(state);
         }
