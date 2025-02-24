@@ -24,14 +24,7 @@
         var stompClient = null;
         var score = 0;
 
-
-
-
-        window.onload =connect;
-
-
-
-
+       setTimeout(connect,500);
 
         function setConnected(connected) {
             $("#connect").prop("disabled", connected);
@@ -63,6 +56,12 @@
             });
             stompClient.onConnect = function (frame) {
                 frameHandler(frame)
+                stompClient.publish({
+                destination:"/app/start",
+                body: JSON.stringify({
+                  '': ''
+                })
+            })
             };
             stompClient.onWebsocketClose = function () {
                 onSocketClose();

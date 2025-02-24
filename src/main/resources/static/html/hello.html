@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet"/>
+    <style>
+         body {
+  font-family: 'Courier New', monospace;
+  font-size: 25px;
+  background-color: rgb(255, 0, 0);
+}
+
+#controls{text-align: center;}
+
+.buttonStart {
+    position: absolute;
+    font-size: 16px;
+    top:50%;
+    background-color:#0a0a23;
+    color: #fff;
+}
+
+.buttonProfile {
+    font-size: 16px;
+    background-color:#0a0a11;
+    color: #fff;
+}
+
+.buttonRegistration {
+    font-size: 16px;
+    background-color:#0a0a11;
+    color: #fff;
+}
+
+#header{text-align: center;}
+
+#helloBox{font-size: 50px;}
+#bestPlayerBox{font-size: 35px;}
+#bestScoreBox{font-size: 35px;}
+
+img.displayed {
+    display: block;
+    margin-left: auto;
+    margin-right: auto }
+
+img.raging {
+    display: block;
+    margin-left: auto;
+    margin-right: auto }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script>
+        var stompClient = null;
+
+        window.onload =connect;
+
+
+        function setConnected(connected) {
+            $("#connect").prop("disabled", connected);
+            $("#connectSockJS").prop("disabled", connected);
+            $("#disconnect").prop("disabled", !connected);
+            if (connected) {
+                $("#responses").show();
+            } else {
+                $("#responses").hide();
+            }
+            $("#messages").html("");
+        }
+
+        function frameHandler(frame) {
+            setConnected(true);
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/messages', function (message) {
+                showMessage(message.body);
+            });
+        }
+
+        function onSocketClose() {
+            if (stompClient !== null) {
+                stompClient.deactivate();
+            }
+            setConnected(false);
+            console.log("Socket was closed. Setting connected to false!")
+        }
+
+        function connect() {
+            stompClient = new window.StompJs.Client({
+                webSocketFactory: function () {
+                    return new WebSocket("ws://localhost:8080/websocket");
+                }
+            });
+            stompClient.onConnect = function (frame) {
+                frameHandler(frame)
+            };
+            stompClient.onWebsocketClose = function () {
+                onSocketClose();
+            };
+
+            playSound('hello_sound');
+
+            stompClient.activate();
+        }
+
+        function connectSockJs() {
+            stompClient = new window.StompJs.Client({
+                webSocketFactory: function () {
+                    return new window.SockJS("http://localhost:8080/sockjs");
+                }
+            });
+            stompClient.onConnect = function (frame) {
+                frameHandler(frame)
+            };
+            stompClient.onWebsocketClose = function () {
+                onSocketClose();
+            };
+
+            stompClient.activate();
+        }
+
+        function disconnect() {
+            if (stompClient !== null) {
+                stompClient.deactivate();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+        function sendMessage() {
+            window.location = "http://localhost:8080/html/index.html";
+        }
+
+        function showMessage(message) {
+            var msg = JSON.parse(message);
+            $("#responses").prepend("<tr>" +
+                "<td class='timeStamp'>" + msg['timeStamp'] + "</td>" +
+                "<td class='from'>" + msg['from'] + "</td>" +
+                "<td>" + msg['message'] + "</td>" +
+                "</tr>");
+        }
+
+        $(function () {
+            $("form").on('submit', function (e) {
+                e.preventDefault();
+            });
+            $("#connect").click(function () {
+                connect();
+            });
+            $("#connectSockJS").click(function () {
+                connectSockJs();
+            });
+            $("#disconnect").click(function () {
+                disconnect();
+            });
+            $("#startGameButton").click(function () {
+                sendMessage();
+            });
+            $("document").ready(function () {
+                disconnect();
+            });
+        });
+
+        function playSound(id){
+          var audio = document.getElementById(id);
+         if (id == 'snap_sound')
+           {
+
+
+             if (typeof audio.loop == 'boolean')
+               {
+                 audio.loop = true;
+               }
+             else
+               {
+                  audio.addEventListener('ended', function() {
+                  this.currentTime = 0;
+                  this.play();
+                      }, false);
+                  }
+           }
+
+           audio.play();
+        }
+
+
+
+    </script>
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+
+<button class="btn btn-default" id="connect" type="submit">Connect</button>
+<button class="btn btn-default" id="connectSockJS" type="submit">ConnectSockJS</button>
+<button class="btn btn-default" id="send" type="submit">Send</button>
+
+<h1 text align="center"> <b id="helloBox"> Hello ${player}! WELCOME TO RAGING HORSE TETRIS!</b> </h1>
+<h2 text align="center"> <b id="bestPlayerBox"> Wanna challenge the best player ${bestPlayer}</b> </h2>
+<h3 text align="center"> <b id="bestScoreBox"> with his score ${bestScore}?</b> </h3>
+<img class="displayed" src="../img/black.png" alt="" width="240" height="384" >
+<img class="raging" src="../img/raging.jpg" alt="" width="120" height="120">
+
+<div id="controls">
+    <button id="startGameButton" type="button" class="buttonStart" >Start</button>
+    <button id="profileButton" type="button" class="buttonProfile" onclick="profile()" >Your Profile</button>
+
+    <button id="registrationButton" type="button" class="buttonRegistration" onclick="register()" >Admin</button>
+
+</div>
+
+<audio id="hello_sound">
+    <source  src="http://localhost:8080/sounds/hello.mp3" type="audio/mpeg"></source>
+    <source  src="http://localhost:8080/sounds/hello.ogg" type="audio/ogg"></source>
+</audio>
+
+</body>
+</html>
