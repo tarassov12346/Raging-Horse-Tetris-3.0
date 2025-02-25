@@ -1,15 +1,24 @@
 package com.app.game.tetris.model;
 
+import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
+@Data
+@Entity
+@Table(name = "games")
 public class Game {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
 
+    @Column(name = "name")
     private String playerName;
 
     public Long getId() {
@@ -17,6 +26,7 @@ public class Game {
     }
 
 
+    @Column(name = "score")
     private int playerScore;
 
     public Game() {

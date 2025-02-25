@@ -1,5 +1,8 @@
 package com.app.game.tetris.controller;
 
+import com.app.game.tetris.daoservice.DaoGameService;
+import com.app.game.tetris.daoserviceImpl.DaoGame;
+import com.app.game.tetris.model.Game;
 import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +22,27 @@ public class TetrisController {
     @Autowired
     private PlayGameService playGameService;
 
+    @Autowired
+    private DaoGameService daoGameService;
+
     private State state;
 
     @Autowired
     private SimpMessagingTemplate template;
 
+    @MessageMapping("/hello")
+    public void hello() {
+        state = playGameService.initiateState("admin");
+        daoGameService.retrieveScores();
+        sendGameToBeDisplayed(state.getGame());
+        sendDaoGameToBeDisplayed(playGameService.createGame(daoGameService.getBestPlayer(), daoGameService.getBestScore()));
+    }
+
     @MessageMapping("/{moveId}")
     public void gamePlayDown(@DestinationVariable String moveId) {
         switch (moveId) {
             case "start" -> {
-                state = playGameService.initiateState("USERTEST");
+
                 ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
                 service.scheduleAtFixedRate(() -> state = sendStateToBeDisplayed(state), 0, 1000, TimeUnit.MILLISECONDS);
             }
@@ -57,6 +71,14 @@ public class TetrisController {
         State stateToBeSent = state.buildState(state.getStage().buildStage(cellsToBeDisplayed), state.isRunning(), state.getGame());
         this.template.convertAndSend("/receive/stateObjects", stateToBeSent);
         return state;
+    }
+
+    private void sendDaoGameToBeDisplayed(Game game) {
+        this.template.convertAndSend("/receive/daoGameObjects", game);
+    }
+
+    private void sendGameToBeDisplayed(Game game) {
+        this.template.convertAndSend("/receive/gameObjects", game);
     }
 
     private State createStateAfterMoveDown(State state) {

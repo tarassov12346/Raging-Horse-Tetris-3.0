@@ -57,24 +57,23 @@ img.raging {
 
         window.onload =connect;
 
-
         function setConnected(connected) {
             $("#connect").prop("disabled", connected);
             $("#connectSockJS").prop("disabled", connected);
             $("#disconnect").prop("disabled", !connected);
-            if (connected) {
-                $("#responses").show();
-            } else {
-                $("#responses").hide();
-            }
-            $("#messages").html("");
         }
 
-        function frameHandler(frame) {
+        function frameHandlerDaoGame(frame) {
             setConnected(true);
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/messages', function (message) {
-                showMessage(message.body);
+            stompClient.subscribe('/receive/daoGameObjects', function (daoGame) {
+                showDaoGame(daoGame.body);
+            });
+        }
+
+        function frameHandlerGame(frame) {
+            stompClient.subscribe('/receive/gameObjects', function (game) {
+                showGame(game.body);
             });
         }
 
@@ -93,7 +92,17 @@ img.raging {
                 }
             });
             stompClient.onConnect = function (frame) {
-                frameHandler(frame)
+                frameHandlerDaoGame(frame)
+
+                 frameHandlerGame(frame)
+
+                stompClient.publish({
+                destination:"/app/hello",
+                body: JSON.stringify({
+                  '': ''
+                })
+            })
+
             };
             stompClient.onWebsocketClose = function () {
                 onSocketClose();
@@ -132,13 +141,23 @@ img.raging {
             window.location = "http://localhost:8080/html/index.html";
         }
 
-        function showMessage(message) {
-            var msg = JSON.parse(message);
-            $("#responses").prepend("<tr>" +
-                "<td class='timeStamp'>" + msg['timeStamp'] + "</td>" +
-                "<td class='from'>" + msg['from'] + "</td>" +
-                "<td>" + msg['message'] + "</td>" +
-                "</tr>");
+        function showDaoGame(game) {
+            var jsonDaoGame = JSON.parse(game);
+           var bestPlayer = jsonDaoGame['playerName'];
+           var bestScore = jsonDaoGame['playerScore'];
+
+<!-- $("#helloBox").text('Hello ' + playerName + '! WELCOME TO RAGING HORSE TETRIS!'); -->
+
+            $("#bestPlayerBox").text('Wanna challenge the best player '+bestPlayer);
+
+            $("#bestScoreBox").text('with his score '+bestScore+'?');
+
+        }
+
+        function showGame(game) {
+           var jsonGame = JSON.parse(game);
+           var playerName = jsonGame['playerName'];
+             $("#helloBox").text('Hello ' + playerName + '! WELCOME TO RAGING HORSE TETRIS!');
         }
 
         $(function () {
@@ -166,8 +185,6 @@ img.raging {
           var audio = document.getElementById(id);
          if (id == 'snap_sound')
            {
-
-
              if (typeof audio.loop == 'boolean')
                {
                  audio.loop = true;
@@ -180,12 +197,8 @@ img.raging {
                       }, false);
                   }
            }
-
            audio.play();
         }
-
-
-
     </script>
 </head>
 <body>
@@ -197,9 +210,9 @@ img.raging {
 <button class="btn btn-default" id="connectSockJS" type="submit">ConnectSockJS</button>
 <button class="btn btn-default" id="send" type="submit">Send</button>
 
-<h1 text align="center"> <b id="helloBox"> Hello ${player}! WELCOME TO RAGING HORSE TETRIS!</b> </h1>
-<h2 text align="center"> <b id="bestPlayerBox"> Wanna challenge the best player ${bestPlayer}</b> </h2>
-<h3 text align="center"> <b id="bestScoreBox"> with his score ${bestScore}?</b> </h3>
+<h1 text align="center"> <b id="helloBox"> </b> </h1>
+<h2 text align="center"> <b id="bestPlayerBox"> </b> </h2>
+<h3 text align="center"> <b id="bestScoreBox"></b> </h3>
 <img class="displayed" src="../img/black.png" alt="" width="240" height="384" >
 <img class="raging" src="../img/raging.jpg" alt="" width="120" height="120">
 

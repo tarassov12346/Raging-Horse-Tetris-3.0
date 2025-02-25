@@ -1,5 +1,7 @@
 package com.app.game.tetris.serviceImpl;
 
+import com.app.game.tetris.daoservice.DaoGameService;
+import com.app.game.tetris.daoserviceImpl.DaoGame;
 import com.app.game.tetris.model.Game;
 import com.app.game.tetris.model.Tetramino;
 import com.app.game.tetris.service.GameLogic;
@@ -27,16 +29,15 @@ public class PlayGame implements PlayGameService {
     @Autowired
     private Tetramino tetramino;
 
-
     @Override
-    public Game createGame(String playerName) {
-        return game.buildGame(playerName, 0);
+    public Game createGame(String playerName, int playerScore) {
+        return game.buildGame(playerName, playerScore);
     }
 
     @Override
     public State initiateState(String playerName) {
         Stage emptyStage = stage.buildStage(makeEmptyMatrix(), getTetramino0(), 0, 0, 0);
-        State initialState = state.buildState(emptyStage, false, createGame(playerName));
+        State initialState = state.buildState(emptyStage, false, createGame(playerName,0));
         return initialState.start().createStateWithNewTetramino().orElse(initialState);
     }
 
