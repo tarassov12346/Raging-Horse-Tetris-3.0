@@ -32,11 +32,18 @@
             $("#disconnect").prop("disabled", !connected);
         }
 
-        function frameHandler(frame) {
+        function frameHandlerState(frame) {
             setConnected(true);
             console.log('Connected: ' + frame);
             stompClient.subscribe('/receive/stateObjects', function (state) {
                 showState(state.body);
+            });
+        }
+
+        function frameHandlerDaoGame(frame) {
+
+             stompClient.subscribe('/receive/daoGameObjects', function (game) {
+                showDaoGame(game.body);
             });
         }
 
@@ -55,7 +62,10 @@
                 }
             });
             stompClient.onConnect = function (frame) {
-                frameHandler(frame)
+                frameHandlerState(frame)
+
+                frameHandlerDaoGame(frame)
+
                 stompClient.publish({
                 destination:"/app/start",
                 body: JSON.stringify({
@@ -106,35 +116,34 @@
         function showState(state) {
             var jsonState = JSON.parse(state);
             var matrix = jsonState['stage']['cells'];
-
             var speed = score/10+1;
             var status = jsonState['running'];
-
             if (jsonState['game']['playerScore']> score) {
             playSound('score_sound');
             score = jsonState['game']['playerScore'];
             }
             else {playSound('game_sound');}
-
             $("#playerBox").text(jsonState['game']['playerName']);
             $("#playerScoreBox").text(score);
             $("#tetrisSpeedBox").text('TETRIS at speed ' + speed);
-
            if (status) $("#gameStatusBox").text('Game status: ON');
            else {
            $("#gameStatusBox").text('Game status: OVER');
            playSound('registered_sound');
            }
-
-
-
-
             for (let i = 0; i < 20; i++) {
                 for (let j = 0; j < 12; j++) {
                       $("#c"+i+"v"+j).attr("src","http://localhost:8080/img/"+matrix[i][j]+".png");
                 }
              }
+        }
 
+        function showDaoGame(game) {
+           var jsonDaoGame = JSON.parse(game);
+           var bestPlayer = jsonDaoGame['playerName'];
+           var bestScore = jsonDaoGame['playerScore'];
+            $("#bestPlayerBox").text(bestPlayer);
+            $("#bestPlayerScoreBox").text(bestScore);
         }
 
         $(function () {
@@ -278,9 +287,9 @@
     </tr>
     <tr>
         <td> <b> Best Player </b></td>
-        <td id="bestPlayerBox">  ${bestplayer}</td>
+        <td id="bestPlayerBox"> </td>
         <td> <b> Best Score </b> </td>
-        <td id="bestPlayerScoreBox">  ${bestscore}</td>
+        <td id="bestPlayerScoreBox"> </td>
     </tr>
 </table>
 

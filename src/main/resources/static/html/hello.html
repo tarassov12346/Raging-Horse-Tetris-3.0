@@ -142,16 +142,11 @@ img.raging {
         }
 
         function showDaoGame(game) {
-            var jsonDaoGame = JSON.parse(game);
+           var jsonDaoGame = JSON.parse(game);
            var bestPlayer = jsonDaoGame['playerName'];
            var bestScore = jsonDaoGame['playerScore'];
-
-<!-- $("#helloBox").text('Hello ' + playerName + '! WELCOME TO RAGING HORSE TETRIS!'); -->
-
             $("#bestPlayerBox").text('Wanna challenge the best player '+bestPlayer);
-
             $("#bestScoreBox").text('with his score '+bestScore+'?');
-
         }
 
         function showGame(game) {

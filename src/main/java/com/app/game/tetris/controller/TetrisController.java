@@ -43,6 +43,8 @@ public class TetrisController {
         switch (moveId) {
             case "start" -> {
 
+                sendDaoGameToBeDisplayed(playGameService.createGame(daoGameService.getBestPlayer(), daoGameService.getBestScore()));
+
                 ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
                 service.scheduleAtFixedRate(() -> state = sendStateToBeDisplayed(state), 0, 1000, TimeUnit.MILLISECONDS);
             }
@@ -87,6 +89,7 @@ public class TetrisController {
             Optional<State> newTetraminoState = playGameService.newTetraminoState(state);
             if (newTetraminoState.isEmpty()) {
                 state = state.stop();
+                daoGameService.recordScore(state.getGame());
                 return state;
             } else state = newTetraminoState.orElse(state);
         }
