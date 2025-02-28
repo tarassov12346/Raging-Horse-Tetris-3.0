@@ -162,6 +162,12 @@
             $("#start").click(function () {
                 start();
             });
+
+            $("#newGameButton").click(function () {
+                hello();
+               window.location = "http://localhost:8080/html/index.html";
+            });
+
             $("document").ready(function () {
                 disconnect();
             });
@@ -183,6 +189,15 @@
 
             });
         });
+
+         function hello() {
+           stompClient.publish({
+         destination:"/app/hello",
+          body: JSON.stringify({
+                    '': ''
+                })
+         });
+        }
 
         function rotate() {
            stompClient.publish({
@@ -586,7 +601,7 @@
     <button id="leftButton" onclick="left()" >Left</button>
     <button id="rotateButton" onclick="rotate()" >Rotate</button>
     <button id="dropButton" onclick="drop()" >Drop</button>
-    <button id="newGameButton" onclick="newgame()" >NewGame</button>
+    <button id="newGameButton" >NewGame</button>
     <button id="saveButton" onclick="save()" >Save</button>
     <button id="restartButton" onclick="restart()" >Restart</button>
     <button id="rightButton" onclick="right()" >Right</button>

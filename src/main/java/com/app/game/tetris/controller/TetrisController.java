@@ -26,6 +26,7 @@ public class TetrisController {
     private DaoGameService daoGameService;
 
     private State state;
+    private  ScheduledExecutorService service;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -42,10 +43,8 @@ public class TetrisController {
     public void gamePlayDown(@DestinationVariable String moveId) {
         switch (moveId) {
             case "start" -> {
-
                 sendDaoGameToBeDisplayed(playGameService.createGame(daoGameService.getBestPlayer(), daoGameService.getBestScore()));
-
-                ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+                service = Executors.newScheduledThreadPool(1);
                 service.scheduleAtFixedRate(() -> state = sendStateToBeDisplayed(state), 0, 1000, TimeUnit.MILLISECONDS);
             }
             case "1" -> {
@@ -90,6 +89,7 @@ public class TetrisController {
             if (newTetraminoState.isEmpty()) {
                 state = state.stop();
                 daoGameService.recordScore(state.getGame());
+                service.shutdown();
                 return state;
             } else state = newTetraminoState.orElse(state);
         }
