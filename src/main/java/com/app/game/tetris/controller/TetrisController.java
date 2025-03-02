@@ -1,7 +1,7 @@
 package com.app.game.tetris.controller;
 
 import com.app.game.tetris.daoservice.DaoGameService;
-import com.app.game.tetris.daoserviceImpl.DaoGame;
+import com.app.game.tetris.daoservice.DaoUserService;
 import com.app.game.tetris.model.Game;
 import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
@@ -11,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,9 +32,15 @@ public class TetrisController {
     @Autowired
     private SimpMessagingTemplate template;
 
+
+    @Autowired
+    private DaoUserService daoUserService;
+
+
+
     @MessageMapping("/hello")
-    public void hello() {
-        state = playGameService.initiateState("admin");
+    public void hello(Principal principal) {
+        state = playGameService.initiateState(principal.getName());
         daoGameService.retrieveScores();
         sendGameToBeDisplayed(state.getGame());
         sendDaoGameToBeDisplayed(playGameService.createGame(daoGameService.getBestPlayer(), daoGameService.getBestScore()));

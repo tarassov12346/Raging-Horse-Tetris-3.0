@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:form="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>REGISTRATION</title>
+
+    <style>
+        body {
+  font-family: 'Courier New', monospace;
+  font-size: 25px;
+  background-color: rgb(100, 100, 100);
+     }
+
+#registration{text-align: center;}
+    </style>
+
+</head>
+
+<script>
+function logIn() {
+ window.location = "http://localhost:8080/html/hello.html";
+}
+</script>
+
+
+
+<body>
+<div id="registration">
+
+        <h2>REGISTRATION FORM</h2>
+        <div>
+            <form:input type="text" minlength="4" path="username" placeholder="Username"
+                        autofocus="true"></form:input>
+            <form:errors path="username"></form:errors>
+            ${usernameError}
+        </div>
+        <div>
+            <form:input type="password" path="password" placeholder="Password"></form:input>
+        </div>
+        <div>
+            <form:input type="password" minlength="3" path="passwordConfirm"
+                        placeholder="Confirm your password"></form:input>
+            <form:errors path="password"></form:errors>
+            ${passwordError}
+
+        </div>
+
+        <button type="submit">REGISTER YOURSELF AS USER</button>
+
+    <div id="controls">
+        <button id="logInButton" type="button" class="buttonLogIn" onclick="logIn()" >LOGIN</button>
+    </div>
+
+
+    <img class="displayed" src="../img/black.png" alt="" width="240" height="384" >
+
+
+
+</div>
+</body>
+</html>
