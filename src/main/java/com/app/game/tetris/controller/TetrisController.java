@@ -3,6 +3,7 @@ package com.app.game.tetris.controller;
 import com.app.game.tetris.daoservice.DaoGameService;
 import com.app.game.tetris.daoservice.DaoUserService;
 import com.app.game.tetris.model.Game;
+import com.app.game.tetris.model.User;
 import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class TetrisController {
     private DaoGameService daoGameService;
 
     private State state;
-    private  ScheduledExecutorService service;
+    private ScheduledExecutorService service;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -37,6 +38,23 @@ public class TetrisController {
     private DaoUserService daoUserService;
 
 
+    @MessageMapping("/register")
+    public void register(User user) {
+        User newUser = new User();
+
+        if (user.getPassword().equals(user.getPasswordConfirm())) {
+            newUser.setUsername(user.getUsername());
+            newUser.setPassword(user.getPassword());
+            newUser.setPasswordConfirm(user.getPasswordConfirm());
+        } else {
+            this.template.convertAndSend("/receive/message", "The password is not confirmed!");
+        }
+        if (!daoUserService.saveUser(newUser)) {
+            this.template.convertAndSend("/receive/message", "This user already exists!");
+        } else {
+            this.template.convertAndSend("/receive/message", "The user "+newUser.getUsername()+" has been successfully registered!");
+        }
+    }
 
     @MessageMapping("/hello")
     public void hello(Principal principal) {

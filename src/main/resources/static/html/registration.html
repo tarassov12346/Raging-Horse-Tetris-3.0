@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:form="http://www.w3.org/1999/xhtml">
+<html lang="en" >
 <head>
     <meta charset="UTF-8">
     <title>REGISTRATION</title>
@@ -14,38 +14,139 @@
 #registration{text-align: center;}
     </style>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+
+
+    <script>
+ var stompClient = null;
+
+ setTimeout(connect,500);
+
+        function setConnected(connected) {
+            $("#connect").prop("disabled", connected);
+            $("#connectSockJS").prop("disabled", connected);
+            $("#disconnect").prop("disabled", !connected);
+
+        }
+
+        function frameHandler(frame) {
+            setConnected(true);
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/receive/message', function (message) {
+              playSound('registered_sound');
+              window.alert(message.body);
+            });
+        }
+
+        function onSocketClose() {
+            if (stompClient !== null) {
+                stompClient.deactivate();
+            }
+            setConnected(false);
+            console.log("Socket was closed. Setting connected to false!")
+        }
+
+        function connect() {
+            stompClient = new window.StompJs.Client({
+                webSocketFactory: function () {
+                    return new WebSocket("ws://localhost:8080/register");
+                }
+            });
+
+            stompClient.onConnect = function (frame) {
+                frameHandler(frame)
+            };
+            stompClient.onWebsocketClose = function () {
+                onSocketClose();
+            };
+
+            stompClient.activate();
+        }
+
+        function connectSockJs() {
+            stompClient = new window.StompJs.Client({
+                webSocketFactory: function () {
+                    return new window.SockJS("http://localhost:8080/sockjs");
+                }
+            });
+            stompClient.onConnect = function (frame) {
+                frameHandler(frame)
+            };
+            stompClient.onWebsocketClose = function () {
+                onSocketClose();
+            };
+
+            stompClient.activate();
+        }
+
+        function disconnect() {
+            if (stompClient !== null) {
+                stompClient.deactivate();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+         function sendUser() {
+            stompClient.publish({
+                destination:"/app/register",
+                body: JSON.stringify({
+                    'username': $("#username").val(),
+                    'password': $("#password").val(),
+                    'passwordConfirm': $("#passwordConfirm").val()
+                })
+            });
+        }
+
+        $(function () {
+           $("#registerButton").click(function () {
+                sendUser();
+            });
+            $("#connect").click(function () {
+                connect();
+            });
+            $("#connectSockJS").click(function () {
+                connectSockJs();
+            });
+            $("#disconnect").click(function () {
+                disconnect();
+            });
+            $("document").ready(function () {
+                disconnect();
+            });
+        });
+
+       function playSound(id){
+          var audio = document.getElementById(id);
+           audio.play();
+       }
+
+       function logIn() {
+          window.location = "http://localhost:8080/html/hello.html";
+        }
+</script>
 </head>
 
-<script>
-function logIn() {
- window.location = "http://localhost:8080/html/hello.html";
-}
-</script>
-
-
-
 <body>
+
+<button class="btn btn-default" id="connect" type="submit">Connect</button>
+<button class="btn btn-default" id="connectSockJS" type="submit">ConnectSockJS</button>
+<button class="btn btn-default" id="send" type="submit">Send</button>
+
+
+
 <div id="registration">
 
         <h2>REGISTRATION FORM</h2>
-        <div>
-            <form:input type="text" minlength="4" path="username" placeholder="Username"
-                        autofocus="true"></form:input>
-            <form:errors path="username"></form:errors>
-            ${usernameError}
-        </div>
-        <div>
-            <form:input type="password" path="password" placeholder="Password"></form:input>
-        </div>
-        <div>
-            <form:input type="password" minlength="3" path="passwordConfirm"
-                        placeholder="Confirm your password"></form:input>
-            <form:errors path="password"></form:errors>
-            ${passwordError}
 
-        </div>
+    <p>New user name: <input type="text" id="username"></p>
+    <p>New user password: <input type="password" id="password"></p>
+    <p>New user password confirm: <input type="password" id="passwordConfirm"></p>
 
-        <button type="submit">REGISTER YOURSELF AS USER</button>
+
+        <button  id="registerButton" type="submit">REGISTER YOURSELF AS USER</button>
 
     <div id="controls">
         <button id="logInButton" type="button" class="buttonLogIn" onclick="logIn()" >LOGIN</button>
@@ -57,5 +158,9 @@ function logIn() {
 
 
 </div>
+<audio id="registered_sound">
+    <source  src="http://localhost:8080/sounds/registered.mp3" type="audio/mpeg"></source>
+    <source  src="http://localhost:8080/sounds/registered.ogg" type="audio/ogg"></source>
+</audio>
 </body>
 </html>

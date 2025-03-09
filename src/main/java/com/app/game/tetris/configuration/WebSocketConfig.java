@@ -35,6 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * endpoint for our websocket to be hosted on
          */
         registry.addEndpoint("/websocket");
+        registry.addEndpoint("/register");
         /*
          * This configures an endpoint with a fallback for SockJS in case the
          * client (an old browser) doesn't support WebSockets natively
