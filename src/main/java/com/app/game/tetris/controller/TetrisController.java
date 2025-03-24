@@ -44,7 +44,14 @@ public class TetrisController {
     @MessageMapping("/register")
     public void register(User user) {
         User newUser = new User();
-
+        if (!user.getUsername().matches(".*[a-zA-Z]+.*")) {
+            this.template.convertAndSend("/receive/message", "The user name should contain at least one letter!");
+            return;
+        }
+        if (!user.getPassword().matches(".*[a-zA-Z]+.*")||!user.getPassword().matches("(.)*(\\d)(.)*")) {
+            this.template.convertAndSend("/receive/message", "The password should contain at least one letter and one digit!");
+            return;
+        }
         if (user.getPassword().equals(user.getPasswordConfirm())) {
             newUser.setUsername(user.getUsername());
             newUser.setPassword(user.getPassword());
