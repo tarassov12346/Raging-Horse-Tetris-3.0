@@ -27,7 +27,7 @@
     color: #fff;
 }
 
-.buttonRegistration {
+.buttonAdmin {
     font-size: 16px;
     background-color:#0a0a11;
     color: #fff;
@@ -55,7 +55,7 @@ img.raging {
     <script>
         var stompClient = null;
 
-        window.onload =connect;
+        setTimeout(connect,500);
 
         function setConnected(connected) {
             $("#connect").prop("disabled", connected);
@@ -137,8 +137,12 @@ img.raging {
             console.log("Disconnected");
         }
 
-        function sendMessage() {
+        function index() {
             window.location = "http://localhost:8080/html/index.html";
+        }
+
+        function admin() {
+            window.location = "http://localhost:8080/html/admin.html";
         }
 
         function showDaoGame(game) {
@@ -169,8 +173,13 @@ img.raging {
                 disconnect();
             });
             $("#startGameButton").click(function () {
-                sendMessage();
+                index();
             });
+
+            $("#adminButton").click(function () {
+                admin();
+            });
+
             $("document").ready(function () {
                 disconnect();
             });
@@ -214,9 +223,7 @@ img.raging {
 <div id="controls">
     <button id="startGameButton" type="button" class="buttonStart" >Start</button>
     <button id="profileButton" type="button" class="buttonProfile" onclick="profile()" >Your Profile</button>
-
-    <button id="registrationButton" type="button" class="buttonRegistration" onclick="register()" >Admin</button>
-
+    <button id="adminButton" type="button" class="buttonAdmin" >Admin</button>
 </div>
 
 <audio id="hello_sound">

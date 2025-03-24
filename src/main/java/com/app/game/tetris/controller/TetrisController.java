@@ -3,6 +3,7 @@ package com.app.game.tetris.controller;
 import com.app.game.tetris.daoservice.DaoGameService;
 import com.app.game.tetris.daoservice.DaoUserService;
 import com.app.game.tetris.model.Game;
+import com.app.game.tetris.model.Roles;
 import com.app.game.tetris.model.User;
 import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
@@ -13,10 +14,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Controller
 public class TetrisController {
@@ -28,6 +30,7 @@ public class TetrisController {
     private DaoGameService daoGameService;
 
     private State state;
+
     private ScheduledExecutorService service;
 
     @Autowired
@@ -52,7 +55,7 @@ public class TetrisController {
         if (!daoUserService.saveUser(newUser)) {
             this.template.convertAndSend("/receive/message", "This user already exists!");
         } else {
-            this.template.convertAndSend("/receive/message", "The user "+newUser.getUsername()+" has been successfully registered!");
+            this.template.convertAndSend("/receive/message", "The user " + newUser.getUsername() + " has been successfully registered!");
         }
     }
 
@@ -62,6 +65,35 @@ public class TetrisController {
         daoGameService.retrieveScores();
         sendGameToBeDisplayed(state.getGame());
         sendDaoGameToBeDisplayed(playGameService.createGame(daoGameService.getBestPlayer(), daoGameService.getBestScore()));
+    }
+
+    @MessageMapping("/admin")
+    public void admin() {
+        List<User> allUsersList = daoUserService.getAllUsers();
+        allUsersList.forEach(user -> this.template.convertAndSend("/receive/users",
+                new User(user.getId(), user.getUsername(), user.getPassword(),
+                        String.join(";", user.getRoles().stream().map(Roles::getName).collect(Collectors.toList())),
+                        user.getRoles())));
+        getAllBestResults(daoGameService.getAllGames()).
+                forEach(game -> this.template.convertAndSend("/receive/results", game));
+    }
+
+
+    @MessageMapping("/admin/{userId}")
+    public void deleteUser(@DestinationVariable Long userId) {
+        if (daoUserService.findUserById(userId).getUsername().equals(state.getGame().getPlayerName())) {
+            this.template.convertAndSend("/receive/alert", "You cannot delete yourself!");
+            return;
+        }
+        for (Roles role : daoUserService.findUserByUserName(state.getGame().getPlayerName()).getRoles()) {
+            if (role.getName().equals("ROLE_ADMIN")) {
+                daoGameService.deleteByName(daoUserService.findUserById(userId).getUsername());
+                daoUserService.deleteUser(userId);
+                admin();
+                return;
+            }
+            this.template.convertAndSend("/receive/alert", "You are not admin!");
+        }
     }
 
     @MessageMapping("/{moveId}")
@@ -120,5 +152,12 @@ public class TetrisController {
         }
         state = moveDownState.orElse(state);
         return state;
+    }
+
+    private Set<Game> getAllBestResults(List<Game> playersList) {
+        Set<Game> highestScoringPlayers = new HashSet<>();
+        playersList.sort(Comparator.comparingInt(Game::getPlayerScore).reversed());
+        highestScoringPlayers.addAll(playersList);
+        return highestScoringPlayers;
     }
 }
