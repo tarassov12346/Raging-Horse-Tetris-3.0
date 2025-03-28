@@ -27,9 +27,11 @@
        setTimeout(connect,500);
 
         function setConnected(connected) {
-            $("#connect").prop("disabled", connected);
-            $("#connectSockJS").prop("disabled", connected);
-            $("#disconnect").prop("disabled", !connected);
+            $("#leftButton").prop("disabled", connected);
+            $("#rightButton").prop("disabled", connected);
+            $("#rotateButton").prop("disabled", connected);
+            $("#dropButton").prop("disabled", connected);
+            $("#newGameButton").prop("disabled", connected);
         }
 
         function frameHandlerState(frame) {
@@ -47,13 +49,6 @@
             });
         }
 
-        function onSocketClose() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Socket was closed. Setting connected to false!")
-        }
 
         function connect() {
             stompClient = new window.StompJs.Client({
@@ -65,6 +60,8 @@
                 frameHandlerState(frame)
 
                 frameHandlerDaoGame(frame)
+
+                setConnected(false)
 
                 stompClient.publish({
                 destination:"/app/start",
@@ -78,30 +75,6 @@
             };
             playSound('snap_sound');
             stompClient.activate();
-        }
-
-        function connectSockJs() {
-            stompClient = new window.StompJs.Client({
-                webSocketFactory: function () {
-                    return new window.SockJS("http://localhost:8080/sockjs");
-                }
-            });
-            stompClient.onConnect = function (frame) {
-                frameHandler(frame)
-            };
-            stompClient.onWebsocketClose = function () {
-                onSocketClose();
-            };
-
-            stompClient.activate();
-        }
-
-        function disconnect() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Disconnected");
         }
 
         function start() {
@@ -147,30 +120,14 @@
         }
 
         $(function () {
-            $("form").on('submit', function (e) {
-                e.preventDefault();
-            });
-            $("#connect").click(function () {
-                connect();
-            });
-            $("#connectSockJS").click(function () {
-                connectSockJs();
-            });
-            $("#disconnect").click(function () {
-                disconnect();
-            });
-            $("#start").click(function () {
-                start();
-            });
+
+
 
             $("#newGameButton").click(function () {
                 hello();
                window.location = "http://localhost:8080/html/index.html";
             });
 
-            $("document").ready(function () {
-                disconnect();
-            });
 
             $("#leftButton").click(function () {
                 left();
@@ -275,16 +232,6 @@
 
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
-
-
-                    <button class="btn btn-default" id="connect" type="submit">Connect</button>
-                    <button class="btn btn-default" id="connectSockJS" type="submit">ConnectSockJS</button>
-                    <button class="btn btn-default" disabled="disabled" id="disconnect" type="submit">Disconnect</button>
-                    <button class="btn btn-default" id="start" type="submit">Start</button>
-
 
 
 <h1 text align="center"> <b id="tetrisSpeedBox"> </b> </h1>
@@ -598,13 +545,13 @@
 </div>
 
 <div id="controls" align="center">
-    <button id="leftButton" onclick="left()" >Left</button>
-    <button id="rotateButton" onclick="rotate()" >Rotate</button>
-    <button id="dropButton" onclick="drop()" >Drop</button>
-    <button id="newGameButton" >NewGame</button>
-    <button id="saveButton" onclick="save()" >Save</button>
-    <button id="restartButton" onclick="restart()" >Restart</button>
-    <button id="rightButton" onclick="right()" >Right</button>
+    <button id="leftButton" disabled onclick="left()" >Left</button>
+    <button id="rotateButton" disabled onclick="rotate()" >Rotate</button>
+    <button id="dropButton" disabled onclick="drop()" >Drop</button>
+    <button id="newGameButton" disabled>NewGame</button>
+    <button id="saveButton" disabled onclick="save()" >Save</button>
+    <button id="restartButton" disabled onclick="restart()" >Restart</button>
+    <button id="rightButton" disabled onclick="right()" >Right</button>
 </div>
 
 <audio id="game_sound">

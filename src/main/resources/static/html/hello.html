@@ -58,9 +58,9 @@ img.raging {
         setTimeout(connect,500);
 
         function setConnected(connected) {
-            $("#connect").prop("disabled", connected);
-            $("#connectSockJS").prop("disabled", connected);
-            $("#disconnect").prop("disabled", !connected);
+            $("#startGameButton").prop("disabled", connected);
+            $("#adminButton").prop("disabled", connected);
+            $("#profileButton").prop("disabled", connected);
         }
 
         function frameHandlerDaoGame(frame) {
@@ -77,14 +77,6 @@ img.raging {
             });
         }
 
-        function onSocketClose() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Socket was closed. Setting connected to false!")
-        }
-
         function connect() {
             stompClient = new window.StompJs.Client({
                 webSocketFactory: function () {
@@ -95,15 +87,16 @@ img.raging {
                 frameHandlerDaoGame(frame)
 
                  frameHandlerGame(frame)
+                 setConnected(false)
 
                 stompClient.publish({
                 destination:"/app/hello",
-                body: JSON.stringify({
-                  '': ''
+                  body: JSON.stringify({
+                    '': ''
+                  })
                 })
-            })
-
             };
+
             stompClient.onWebsocketClose = function () {
                 onSocketClose();
             };
@@ -111,30 +104,7 @@ img.raging {
             playSound('hello_sound');
 
             stompClient.activate();
-        }
 
-        function connectSockJs() {
-            stompClient = new window.StompJs.Client({
-                webSocketFactory: function () {
-                    return new window.SockJS("http://localhost:8080/sockjs");
-                }
-            });
-            stompClient.onConnect = function (frame) {
-                frameHandler(frame)
-            };
-            stompClient.onWebsocketClose = function () {
-                onSocketClose();
-            };
-
-            stompClient.activate();
-        }
-
-        function disconnect() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Disconnected");
         }
 
         function index() {
@@ -160,18 +130,8 @@ img.raging {
         }
 
         $(function () {
-            $("form").on('submit', function (e) {
-                e.preventDefault();
-            });
-            $("#connect").click(function () {
-                connect();
-            });
-            $("#connectSockJS").click(function () {
-                connectSockJs();
-            });
-            $("#disconnect").click(function () {
-                disconnect();
-            });
+
+
             $("#startGameButton").click(function () {
                 index();
             });
@@ -180,9 +140,7 @@ img.raging {
                 admin();
             });
 
-            $("document").ready(function () {
-                disconnect();
-            });
+
         });
 
         function playSound(id){
@@ -206,13 +164,8 @@ img.raging {
     </script>
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
 
-<button class="btn btn-default" id="connect" type="submit">Connect</button>
-<button class="btn btn-default" id="connectSockJS" type="submit">ConnectSockJS</button>
-<button class="btn btn-default" id="send" type="submit">Send</button>
+
 
 <h1 text align="center"> <b id="helloBox"> </b> </h1>
 <h2 text align="center"> <b id="bestPlayerBox"> </b> </h2>
@@ -221,9 +174,9 @@ img.raging {
 <img class="raging" src="../img/raging.jpg" alt="" width="120" height="120">
 
 <div id="controls">
-    <button id="startGameButton" type="button" class="buttonStart" >Start</button>
-    <button id="profileButton" type="button" class="buttonProfile" onclick="profile()" >Your Profile</button>
-    <button id="adminButton" type="button" class="buttonAdmin" >Admin</button>
+    <button id="startGameButton" disabled type="button" class="buttonStart" >Start</button>
+    <button id="profileButton" disabled type="button" class="buttonProfile" onclick="profile()" >Your Profile</button>
+    <button id="adminButton" disabled type="button" class="buttonAdmin" >Admin</button>
 </div>
 
 <audio id="hello_sound">

@@ -25,10 +25,8 @@
  setTimeout(connect,500);
 
         function setConnected(connected) {
-            $("#connect").prop("disabled", connected);
-            $("#connectSockJS").prop("disabled", connected);
-            $("#disconnect").prop("disabled", !connected);
-
+         $("#registerButton").prop("disabled", connected);
+         $("#logInButton").prop("disabled", connected);
         }
 
         function frameHandler(frame) {
@@ -40,54 +38,22 @@
             });
         }
 
-        function onSocketClose() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Socket was closed. Setting connected to false!")
-        }
-
-        function connect() {
+           function connect() {
             stompClient = new window.StompJs.Client({
                 webSocketFactory: function () {
                     return new WebSocket("ws://localhost:8080/register");
                 }
             });
-
             stompClient.onConnect = function (frame) {
                 frameHandler(frame)
+                setConnected(false)
             };
             stompClient.onWebsocketClose = function () {
                 onSocketClose();
             };
-
             stompClient.activate();
         }
 
-        function connectSockJs() {
-            stompClient = new window.StompJs.Client({
-                webSocketFactory: function () {
-                    return new window.SockJS("http://localhost:8080/sockjs");
-                }
-            });
-            stompClient.onConnect = function (frame) {
-                frameHandler(frame)
-            };
-            stompClient.onWebsocketClose = function () {
-                onSocketClose();
-            };
-
-            stompClient.activate();
-        }
-
-        function disconnect() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Disconnected");
-        }
 
          function sendUser() {
             stompClient.publish({
@@ -104,18 +70,7 @@
            $("#registerButton").click(function () {
                 sendUser();
             });
-            $("#connect").click(function () {
-                connect();
-            });
-            $("#connectSockJS").click(function () {
-                connectSockJs();
-            });
-            $("#disconnect").click(function () {
-                disconnect();
-            });
-            $("document").ready(function () {
-                disconnect();
-            });
+
         });
 
        function playSound(id){
@@ -131,12 +86,6 @@
 
 <body>
 
-<button class="btn btn-default" id="connect" type="submit">Connect</button>
-<button class="btn btn-default" id="connectSockJS" type="submit">ConnectSockJS</button>
-<button class="btn btn-default" id="send" type="submit">Send</button>
-
-
-
 <div id="registration">
 
         <h2>REGISTRATION FORM</h2>
@@ -146,10 +95,10 @@
     <p>New user password confirm: <input type="password" id="passwordConfirm"></p>
 
 
-        <button  id="registerButton" type="submit">REGISTER YOURSELF AS USER</button>
+        <button  id="registerButton" disabled type="submit">REGISTER YOURSELF AS USER</button>
 
     <div id="controls">
-        <button id="logInButton" type="button" class="buttonLogIn" onclick="logIn()" >LOGIN</button>
+        <button id="logInButton" disabled type="button" class="buttonLogIn" onclick="logIn()" >LOGIN</button>
     </div>
 
 

@@ -89,13 +89,6 @@
             });
         }
 
-        function onSocketClose() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Socket was closed. Setting connected to false!")
-        }
 
         function connect() {
             stompClient = new window.StompJs.Client({
@@ -108,6 +101,9 @@
                 frameHandlerUsers(frame)
                 frameHandlerResults(frame)
                 frameHandlerAlerts(frame)
+
+
+
                 sendForAdmin()
             };
             stompClient.onWebsocketClose = function () {
@@ -117,44 +113,8 @@
             stompClient.activate();
         }
 
-        function connectSockJs() {
-            stompClient = new window.StompJs.Client({
-                webSocketFactory: function () {
-                    return new window.SockJS("http://localhost:8080/sockjs");
-                }
-            });
-            stompClient.onConnect = function (frame) {
-                frameHandlerAlerts(frame)
-            };
-            stompClient.onWebsocketClose = function () {
-                onSocketClose();
-            };
-            stompClient.activate();
-        }
 
-        function disconnect() {
-            if (stompClient !== null) {
-                stompClient.deactivate();
-            }
-            setConnected(false);
-            console.log("Disconnected");
-        }
 
-        $(function () {
-
-            $("#connect").click(function () {
-                connect();
-            });
-            $("#connectSockJS").click(function () {
-                connectSockJs();
-            });
-            $("#disconnect").click(function () {
-                disconnect();
-            });
-            $("document").ready(function () {
-                disconnect();
-            });
-        });
 
        function playSound(id){
           var audio = document.getElementById(id);
@@ -206,9 +166,7 @@
 </head>
 
 <body>
-<button class="btn btn-default" id="connect" type="submit">Connect</button>
-<button class="btn btn-default" id="connectSockJS" type="submit">ConnectSockJS</button>
-<button class="btn btn-default" id="send" type="submit">Send</button>
+
 
 <div id="user">
     <h1>ALL REGISTERED USERS</h1>
