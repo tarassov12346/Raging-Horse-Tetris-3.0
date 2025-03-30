@@ -43,6 +43,10 @@ public class TetrisController {
 
     @MessageMapping("/register")
     public void register(User user) {
+        if (daoUserService.isRolesDBEmpty()) {
+            daoUserService.prepareRolesDB();
+            daoUserService.prepareUserDB();
+        }
         User newUser = new User();
         if (!user.getUsername().matches(".*[a-zA-Z]+.*")) {
             this.template.convertAndSend("/receive/message", "The user name should contain at least one letter!");
