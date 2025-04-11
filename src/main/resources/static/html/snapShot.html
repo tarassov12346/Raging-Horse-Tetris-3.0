@@ -16,254 +16,16 @@
         }
     </style>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 
-    <script>
-        var stompClient = null;
-        var score = 0;
-
-       setTimeout(connect,500);
-
-        function setConnected(connected) {
-            $("#leftButton").prop("disabled", connected);
-            $("#rightButton").prop("disabled", connected);
-            $("#rotateButton").prop("disabled", connected);
-            $("#dropButton").prop("disabled", connected);
-            $("#newGameButton").prop("disabled", connected);
-        }
-
-        function frameHandlerState(frame) {
-            setConnected(true);
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/receive/stateObjects', function (state) {
-                showState(state.body);
-            });
-        }
-
-        function frameHandlerDaoGame(frame) {
-
-             stompClient.subscribe('/receive/daoGameObjects', function (game) {
-                showDaoGame(game.body);
-            });
-        }
-
-
-        function connect() {
-            stompClient = new window.StompJs.Client({
-                webSocketFactory: function () {
-                    return new WebSocket("ws://localhost:8080/websocket");
-                }
-            });
-            stompClient.onConnect = function (frame) {
-                frameHandlerState(frame)
-
-                frameHandlerDaoGame(frame)
-
-                setConnected(false)
-
-                stompClient.publish({
-                destination:"/app/start",
-                body: JSON.stringify({
-                  '': ''
-                })
-            })
-            };
-            stompClient.onWebsocketClose = function () {
-                onSocketClose();
-            };
-            playSound('snap_sound');
-            stompClient.activate();
-        }
-
-        function start() {
-            stompClient.publish({
-                destination:"/app/start",
-                body: JSON.stringify({
-                  '': ''
-                })
-            });
-        }
-
-
-
-
-
-
-
-
-
-        function showState(state) {
-            var jsonState = JSON.parse(state);
-            var matrix = jsonState['stage']['cells'];
-            var speed = score/10+1;
-            var status = jsonState['running'];
-            if (jsonState['game']['playerScore']> score) {
-            playSound('score_sound');
-            score = jsonState['game']['playerScore'];
-            }
-            else {playSound('game_sound');}
-            $("#playerBox").text(jsonState['game']['playerName']);
-            $("#playerScoreBox").text(score);
-            $("#tetrisSpeedBox").text('TETRIS at speed ' + speed);
-           if (status) $("#gameStatusBox").text('Game status: ON');
-           else {
-           $("#gameStatusBox").text('Game status: OVER');
-           playSound('registered_sound');
-
-
-           }
-            for (let i = 0; i < 20; i++) {
-                for (let j = 0; j < 12; j++) {
-                      $("#c"+i+"v"+j).attr("src","http://localhost:8080/img/"+matrix[i][j]+".png");
-                }
-            }
-
-            if (!status) snapShot();
-        }
-
-        function snapShot() {
-
-
-
-
-
-            stompClient.publish({
-                destination:"/app/snapShot",
-                body: JSON.stringify({
-                  '': ''
-                })
-            });
-        }
-
-
-
-        function showDaoGame(game) {
-           var jsonDaoGame = JSON.parse(game);
-           var bestPlayer = jsonDaoGame['playerName'];
-           var bestScore = jsonDaoGame['playerScore'];
-            $("#bestPlayerBox").text(bestPlayer);
-            $("#bestPlayerScoreBox").text(bestScore);
-        }
-
-        $(function () {
-
-
-
-            $("#newGameButton").click(function () {
-                hello();
-               window.location = "http://localhost:8080/html/index.html";
-            });
-
-
-            $("#leftButton").click(function () {
-                left();
-
-            });
-            $("#rightButton").click(function () {
-                right();
-
-            });
-            $("#rotateButton").click(function () {
-                rotate();
-
-            });
-            $("#dropButton").click(function () {
-                drop();
-
-            });
-        });
-
-         function hello() {
-           stompClient.publish({
-         destination:"/app/hello",
-          body: JSON.stringify({
-                    '': ''
-                })
-         });
-        }
-
-        function rotate() {
-           stompClient.publish({
-         destination:"/app/1",
-          body: JSON.stringify({
-                    '': ''
-                })
-         });
-        }
-
-        function left() {
-        stompClient.publish({
-         destination:"/app/2",
-          body: JSON.stringify({
-                    '': ''
-                })
-         });
-        }
-
-        function right() {
-          stompClient.publish({
-         destination:"/app/3",
-          body: JSON.stringify({
-                    '': ''
-                })
-         });
-        }
-
-        function drop() {
-          stompClient.publish({
-         destination:"/app/4",
-          body: JSON.stringify({
-                    '': ''
-                })
-         });
-        }
-
-         function playSound(id){
-          var audio = document.getElementById(id);
-         if (id == 'snap_sound')
-           {
-
-
-             if (typeof audio.loop == 'boolean')
-               {
-                 audio.loop = true;
-                 }
-             else
-               {
-                  audio.addEventListener('ended', function() {
-                  this.currentTime = 0;
-                  this.play();
-                      }, false);
-                  }
-              }
-
-           audio.play();
-         }
-
-        document.onkeydown = function(e){
-	    if(e.keyCode == 37){
-	    left()
-	    }
-	    if(e.keyCode == 39){
-        right()
-        }
-        if(e.keyCode == 40){
-        drop()
-        }
-        if(e.keyCode == 38){
-        rotate()
-        }
-}
-    </script>
 
 </head>
+
 <body>
 
 
-<h1 text align="center"> <b id="tetrisSpeedBox"> </b> </h1>
-<h2 text align="center"> <b id="gameStatusBox"> </b> </h2>
+
+<h1 text align="center"> <input id="tetrisSpeedBox">  </h1>
+<h2 text align="center"> <b id="gameStatusBox1"> <input id="gameStatusBox"> </b> </h2>
 
 
 
@@ -271,15 +33,15 @@
 <table align="center" style="background-color: #ffffff; border:1px black solid;" border="1" width="600">
     <tr>
         <td> <b> Player </b> </td>
-        <td id="playerBox"> </td>
+        <td id="playerBox1"> <input id="playerBox"> </td>
         <td> <b> Score </b> </td>
-        <td id="playerScoreBox"> </td>
+        <td id="playerScoreBox1"> <input id="playerScoreBox"></td>
     </tr>
     <tr>
         <td> <b> Best Player </b></td>
-        <td id="bestPlayerBox"> </td>
+        <td id="bestPlayerBox1"> <input id="bestPlayerBox"></td>
         <td> <b> Best Score </b> </td>
-        <td id="bestPlayerScoreBox"> </td>
+        <td id="bestPlayerScoreBox1"> <input id="bestPlayerScoreBox"></td>
     </tr>
 </table>
 
@@ -572,37 +334,6 @@
 </table>
 </div>
 
-<div id="controls" align="center">
-    <button id="leftButton" disabled onclick="left()" >Left</button>
-    <button id="rotateButton" disabled onclick="rotate()" >Rotate</button>
-    <button id="dropButton" disabled onclick="drop()" >Drop</button>
-    <button id="newGameButton" disabled>NewGame</button>
-    <button id="saveButton" disabled onclick="save()" >Save</button>
-    <button id="restartButton" disabled onclick="restart()" >Restart</button>
-    <button id="rightButton" disabled onclick="right()" >Right</button>
-</div>
 
-<audio id="game_sound">
-    <source  src="http://localhost:8080/sounds/0.mp3" type="audio/mpeg"></source>
-    <source  src="http://localhost:8080/sounds/0.ogg" type="audio/ogg"></source>
-</audio>
-
-<audio id="score_sound">
-    <source  src="http://localhost:8080/sounds/score.mp3" type="audio/mpeg"></source>
-    <source  src="http://localhost:8080/sounds/score.ogg" type="audio/ogg"></source>
-</audio>
-
-<audio id="snap_sound">
-    <source  src="http://localhost:8080/sounds/snap.mp3" type="audio/mpeg"></source>
-    <source  src="http://localhost:8080/sounds/snap.ogg" type="audio/ogg"></source>
-</audio>
-
-    <audio id="registered_sound">
-        <source  src="http://localhost:8080/sounds/registered.mp3" type="audio/mpeg"></source>
-        <source  src="http://localhost:8080/sounds/registered.ogg" type="audio/ogg"></source>
-    </audio>
-
-
-</audio>
 </body>
 </html>

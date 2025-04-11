@@ -21,6 +21,6 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer ignoringCustomizer() {
         return (web) -> web.ignoring().
-                requestMatchers("/html/registration.html","/img/**","/sounds/**","/register/**");
+                requestMatchers("/html/registration.html","/img/**","/sounds/**","/register/**","/html/index.html","/html/snapShot.html");
     }
 }

@@ -115,6 +115,10 @@ img.raging {
             window.location = "http://localhost:8080/html/admin.html";
         }
 
+        function profile() {
+            window.location = "http://localhost:8080/html/profile.html";
+        }
+
         function showDaoGame(game) {
            var jsonDaoGame = JSON.parse(game);
            var bestPlayer = jsonDaoGame['playerName'];
@@ -138,6 +142,10 @@ img.raging {
 
             $("#adminButton").click(function () {
                 admin();
+            });
+
+            $("#profileButton").click(function () {
+                profile();
             });
 
 
@@ -175,7 +183,7 @@ img.raging {
 
 <div id="controls">
     <button id="startGameButton" disabled type="button" class="buttonStart" >Start</button>
-    <button id="profileButton" disabled type="button" class="buttonProfile" onclick="profile()" >Your Profile</button>
+    <button id="profileButton" disabled type="button" class="buttonProfile" >Your Profile</button>
     <button id="adminButton" disabled type="button" class="buttonAdmin" >Admin</button>
 </div>
 
