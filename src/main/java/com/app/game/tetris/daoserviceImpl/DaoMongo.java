@@ -229,12 +229,18 @@ public class DaoMongo implements DaoMongoService {
                 }
             }
             playwright.selectors().setTestIdAttribute("id");
-            page.getByTestId("playerBox").fill(state.getGame().getPlayerName());
-            page.getByTestId("playerScoreBox").fill(String.valueOf(state.getGame().getPlayerScore()));
-            page.getByTestId("bestPlayerBox").fill(bestPlayerName);
-            page.getByTestId("bestPlayerScoreBox").fill(String.valueOf(bestPlayerScore));
-            page.getByTestId("tetrisSpeedBox").fill("Tetris at speed " + state.getGame().getPlayerScore() / 10);
-            page.getByTestId("gameStatusBox").fill("Game OVER!");
+            String js = "document.getElementById('gameStatusBox').innerHTML = 'Game OVER!!!'";
+            page.evaluate(js);
+            js = "document.getElementById('playerBox').innerHTML = '"+state.getGame().getPlayerName()+"'";
+            page.evaluate(js);
+            js = "document.getElementById('playerScoreBox').innerHTML = '"+ state.getGame().getPlayerScore() +"'";
+            page.evaluate(js);
+            js = "document.getElementById('bestPlayerBox').innerHTML = '"+bestPlayerName+"'";
+            page.evaluate(js);
+            js = "document.getElementById('bestPlayerScoreBox').innerHTML = '"+bestPlayerScore+"'";
+            page.evaluate(js);
+            js = "document.getElementById('tetrisSpeedBox').innerHTML = 'Tetris at speed "+state.getGame().getPlayerScore() / 10+"'";
+            page.evaluate(js);
             page.waitForTimeout(3000);
             page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get(fileName)));
         }

@@ -62,8 +62,6 @@
             });
         }
 
-
-
         function frameHandlerPlayerAttemptsNumber(frame) {
             setConnected(true);
             console.log('Connected: ' + frame);
@@ -79,14 +77,11 @@
            $("#profileBox").text('Hello '+player+'!'+' Your best score is '+score);
         }
 
-
-
         function showPlayerAttemptsNumber(game) {
            var jsonGame = JSON.parse(game);
            var attempts = jsonGame['playerScore'];
            $("#profileAttemptsBox").text('You have played '+attempts+' times!');
         }
-
 
         function connect() {
             stompClient = new window.StompJs.Client({
@@ -112,27 +107,24 @@
                 onSocketClose();
             };
 
-
-
+            playSound('profile_sound');
             stompClient.activate();
-
         }
 
-
-
+        function playSound(id){
+          var audio = document.getElementById(id);
+           audio.play();
+       }
 
         function index() {
             window.location = "http://localhost:8080/html/index.html";
         }
-
 
         $(function () {
             $("#startGameButton").click(function () {
                 index();
             });
         });
-
-
     </script>
 
 </head>
@@ -150,6 +142,10 @@
 <img class="snapShot" src="/getSnapShot" alt="" width="120" height="120">
 <img class="snapShotBest" src="/getSnapShotBest" alt="" width="120" height="120">
 
+<audio id="profile_sound">
+    <source  src="http://localhost:8080/sounds/profile.mp3" type="audio/mpeg"></source>
+    <source  src="http://localhost:8080/sounds/profile.ogg" type="audio/ogg"></source>
+</audio>
 
 </body>
 </html>
