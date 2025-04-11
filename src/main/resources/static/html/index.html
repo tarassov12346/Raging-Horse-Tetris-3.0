@@ -42,13 +42,20 @@
             });
         }
 
+        function frameHandlerFinalState(frame) {
+            setConnected(true);
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/receive/stateFinal', function (state) {
+                showFinalState(state.body);
+            });
+        }
+
         function frameHandlerDaoGame(frame) {
 
              stompClient.subscribe('/receive/daoGameObjects', function (game) {
                 showDaoGame(game.body);
             });
         }
-
 
         function connect() {
             stompClient = new window.StompJs.Client({
@@ -58,6 +65,8 @@
             });
             stompClient.onConnect = function (frame) {
                 frameHandlerState(frame)
+
+                frameHandlerFinalState(frame)
 
                 frameHandlerDaoGame(frame)
 
@@ -86,13 +95,32 @@
             });
         }
 
-
-
-
-
-
-
-
+        function showFinalState(state) {
+            var jsonState = JSON.parse(state);
+            var matrix = jsonState['stage']['cells'];
+            var speed = score/10+1;
+            var status = jsonState['running'];
+            if (jsonState['game']['playerScore']> score) {
+            score = jsonState['game']['playerScore'];
+            }
+            $("#playerBox").text(jsonState['game']['playerName']);
+            $("#playerScoreBox").text(score);
+            $("#tetrisSpeedBox").text('TETRIS at speed ' + speed);
+           if (status) $("#gameStatusBox").text('Game status: ON');
+           else {
+           $("#gameStatusBox").text('Game status: OVER');
+           playSound('registered_sound');
+           }
+            for (let i = 0; i < 20; i++) {
+                for (let j = 0; j < 12; j++) {
+                      $("#c"+i+"v"+j).attr("src","http://localhost:8080/img/"+matrix[i][j]+".png");
+                }
+            }
+            $("#leftButton").prop("disabled", true);
+            $("#rightButton").prop("disabled", true);
+            $("#rotateButton").prop("disabled", true);
+            $("#dropButton").prop("disabled", true);
+        }
 
         function showState(state) {
             var jsonState = JSON.parse(state);
@@ -109,26 +137,18 @@
             $("#tetrisSpeedBox").text('TETRIS at speed ' + speed);
            if (status) $("#gameStatusBox").text('Game status: ON');
            else {
-           $("#gameStatusBox").text('Game status: OVER');
+           $("#gameStatusBox").text('Game status: PLS WAIT!!!');
            playSound('registered_sound');
-
-
            }
             for (let i = 0; i < 20; i++) {
                 for (let j = 0; j < 12; j++) {
                       $("#c"+i+"v"+j).attr("src","http://localhost:8080/img/"+matrix[i][j]+".png");
                 }
             }
-
             if (!status) snapShot();
         }
 
         function snapShot() {
-
-
-
-
-
             stompClient.publish({
                 destination:"/app/snapShot",
                 body: JSON.stringify({
@@ -136,8 +156,6 @@
                 })
             });
         }
-
-
 
         function showDaoGame(game) {
            var jsonDaoGame = JSON.parse(game);
@@ -148,30 +166,21 @@
         }
 
         $(function () {
-
-
-
             $("#newGameButton").click(function () {
                 hello();
                window.location = "http://localhost:8080/html/index.html";
             });
-
-
             $("#leftButton").click(function () {
                 left();
-
             });
             $("#rightButton").click(function () {
                 right();
-
             });
             $("#rotateButton").click(function () {
                 rotate();
-
             });
             $("#dropButton").click(function () {
                 drop();
-
             });
         });
 
@@ -224,8 +233,6 @@
           var audio = document.getElementById(id);
          if (id == 'snap_sound')
            {
-
-
              if (typeof audio.loop == 'boolean')
                {
                  audio.loop = true;
@@ -238,7 +245,6 @@
                       }, false);
                   }
               }
-
            audio.play();
          }
 
@@ -261,12 +267,8 @@
 </head>
 <body>
 
-
 <h1 text align="center"> <b id="tetrisSpeedBox"> </b> </h1>
 <h2 text align="center"> <b id="gameStatusBox"> </b> </h2>
-
-
-
 
 <table align="center" style="background-color: #ffffff; border:1px black solid;" border="1" width="600">
     <tr>
@@ -282,9 +284,6 @@
         <td id="bestPlayerScoreBox"> </td>
     </tr>
 </table>
-
-
-
 
 <table id= "table" align="center" style="background-color: #ffffff; border:1px black solid;">
     <tr>

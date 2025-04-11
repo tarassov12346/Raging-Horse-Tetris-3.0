@@ -10,7 +10,6 @@ import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -172,7 +171,6 @@ public class TetrisController {
                 forEach(game -> this.template.convertAndSend("/receive/results", game));
     }
 
-
     @MessageMapping("/admin/{userId}")
     public void deleteUser(@DestinationVariable Long userId) {
         if (daoUserService.findUserById(userId).getUsername().equals(state.getGame().getPlayerName())) {
@@ -227,7 +225,7 @@ public class TetrisController {
             daoMongoService.cleanImageMongodb(state.getGame().getPlayerName(), "deskTopSnapShotBest");
             daoMongoService.loadSnapShotIntoMongodb(state.getGame().getPlayerName(), "deskTopSnapShotBest");
         }
-        System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        sendFinalStateToBeDisplayed(state);
     }
 
     private State sendStateToBeDisplayed(State state) {
@@ -235,6 +233,14 @@ public class TetrisController {
         char[][] cellsToBeDisplayed = state.getStage().drawTetraminoOnCells();
         State stateToBeSent = state.buildState(state.getStage().buildStage(cellsToBeDisplayed), state.isRunning(), state.getGame());
         this.template.convertAndSend("/receive/stateObjects", stateToBeSent);
+        return state;
+    }
+
+    private State sendFinalStateToBeDisplayed(State state) {
+        state = createStateAfterMoveDown(state);
+        char[][] cellsToBeDisplayed = state.getStage().drawTetraminoOnCells();
+        State stateToBeSent = state.buildState(state.getStage().buildStage(cellsToBeDisplayed), state.isRunning(), state.getGame());
+        this.template.convertAndSend("/receive/stateFinal", stateToBeSent);
         return state;
     }
 
