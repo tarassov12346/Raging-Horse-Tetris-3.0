@@ -91,6 +91,10 @@ public class TetrisController {
     @MessageMapping("/profile")
     public void profile() {
         daoGameService.retrievePlayerScores(state.getGame());
+
+        if (!daoMongoService.isImageFilePresentInMongoDB(state.getGame().getPlayerName()))
+            daoMongoService.prepareMongoDBForNewPLayer(state.getGame().getPlayerName());
+
         this.template.convertAndSend("/receive/playerStat",
                 playGameService.createGame(state.getGame().getPlayerName(), daoGameService.getPlayerBestScore()));
         this.template.convertAndSend("/receive/playerAttemptsNumber",

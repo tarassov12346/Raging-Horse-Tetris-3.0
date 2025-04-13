@@ -120,6 +120,7 @@
             $("#rightButton").prop("disabled", true);
             $("#rotateButton").prop("disabled", true);
             $("#dropButton").prop("disabled", true);
+            $("#newGameButton").prop("disabled", false);
         }
 
         function showState(state) {
@@ -138,6 +139,13 @@
            if (status) $("#gameStatusBox").text('Game status: ON');
            else {
            $("#gameStatusBox").text('Game status: PLS WAIT!!!');
+
+            $("#leftButton").prop("disabled", true);
+            $("#rightButton").prop("disabled", true);
+            $("#rotateButton").prop("disabled", true);
+            $("#dropButton").prop("disabled", true);
+            $("#newGameButton").prop("disabled", true);
+
            playSound('registered_sound');
            }
             for (let i = 0; i < 20; i++) {
@@ -168,7 +176,7 @@
         $(function () {
             $("#newGameButton").click(function () {
                 hello();
-               window.location = "http://localhost:8080/html/index.html";
+               window.location = "http://localhost:8080/html/profile.html";
             });
             $("#leftButton").click(function () {
                 left();
