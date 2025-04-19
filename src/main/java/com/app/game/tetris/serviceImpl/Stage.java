@@ -10,7 +10,6 @@ import java.util.stream.IntStream;
 
 @Service
 public class Stage implements StageService {
-    private static final StringBuilder pause = new StringBuilder("go!");
     private char[][] cells;
     private Tetramino tetramino;
     private int tetraminoX;
@@ -32,8 +31,8 @@ public class Stage implements StageService {
         return new Stage(cells, tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
     }
 
-    public Stage buildStage(char[][] cells){
-        return buildStage(cells,tetramino,tetraminoX,tetraminoY,collapsedLayersCount);
+    public Stage buildStage(char[][] cells) {
+        return buildStage(cells, tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
     }
 
     public char[][] getCells() {
@@ -98,26 +97,12 @@ public class Stage implements StageService {
 
     @Override
     public Stage moveDown(int step) {
-        if (pause.toString().equals("go!"))
-            return buildStage(cells, tetramino, tetraminoX, tetraminoY + step, collapsedLayersCount);
-        else return buildStage(cells, tetramino, tetraminoX, tetraminoY, collapsedLayersCount);
+        return buildStage(cells, tetramino, tetraminoX, tetraminoY + step, collapsedLayersCount);
     }
 
     @Override
     public Stage rotate() {
         return buildStage(cells, tetramino.buildTetramino(rotateMatrix(tetramino.getShape())), tetraminoX, tetraminoY, collapsedLayersCount);
-    }
-
-    @Override
-    public void setPause() {
-        if (pause.toString().equals("go!")) pause.setCharAt(2, '?');
-        else pause.setCharAt(2, '!');
-    }
-
-    @Override
-    public void unsetPause() {
-        if (pause.toString().equals("go?")) pause.setCharAt(2, '!');
-        else pause.setCharAt(2, '!');
     }
 
     @Override

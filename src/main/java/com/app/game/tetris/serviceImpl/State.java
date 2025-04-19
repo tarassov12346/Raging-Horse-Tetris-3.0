@@ -29,10 +29,6 @@ public class State implements StateService {
     private State() {
     }
 
-    public void setRunning(boolean running) {
-        isRunning = running;
-    }
-
     public boolean isRunning() {
         return isRunning;
     }
@@ -80,16 +76,6 @@ public class State implements StateService {
     @Override
     public Optional<State> rotate() {
         return !checkCollision(0, 0, true) ? Optional.of(rotateTetramino()) : Optional.empty();
-    }
-
-    @Override
-    public void setPause() {
-        stage.setPause();
-    }
-
-    @Override
-    public void unsetPause() {
-        stage.unsetPause();
     }
 
     @Override

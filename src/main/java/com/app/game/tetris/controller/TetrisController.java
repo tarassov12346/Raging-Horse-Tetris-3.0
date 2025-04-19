@@ -5,6 +5,7 @@ import com.app.game.tetris.daoservice.DaoMongoService;
 import com.app.game.tetris.daoservice.DaoUserService;
 import com.app.game.tetris.model.Game;
 import com.app.game.tetris.model.Roles;
+import com.app.game.tetris.model.SavedGame;
 import com.app.game.tetris.model.User;
 import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
@@ -83,7 +84,7 @@ public class TetrisController {
     public void hello(Principal principal) {
         state = playGameService.initiateState(principal.getName());
         daoGameService.retrieveScores();
-        daoMongoService.runMongoServer();
+        //  daoMongoService.runMongoServer();
         sendGameToBeDisplayed(state.getGame());
         sendDaoGameToBeDisplayed(playGameService.createGame(daoGameService.getBestPlayer(), daoGameService.getBestScore()));
     }
@@ -183,6 +184,10 @@ public class TetrisController {
         }
         for (Roles role : daoUserService.findUserByUserName(state.getGame().getPlayerName()).getRoles()) {
             if (role.getName().equals("ROLE_ADMIN")) {
+                daoMongoService.cleanSavedGameMongodb(daoUserService.findUserById(userId).getUsername());
+                daoMongoService.cleanImageMongodb(daoUserService.findUserById(userId).getUsername(), "");
+                daoMongoService.cleanImageMongodb(daoUserService.findUserById(userId).getUsername(), "deskTopSnapShot");
+                daoMongoService.cleanImageMongodb(daoUserService.findUserById(userId).getUsername(), "deskTopSnapShotBest");
                 daoGameService.deleteByName(daoUserService.findUserById(userId).getUsername());
                 daoUserService.deleteUser(userId);
                 admin();
@@ -219,6 +224,25 @@ public class TetrisController {
         }
     }
 
+    @MessageMapping("/save")
+    public void gameSave() {
+        service.shutdown();
+        SavedGame savedGame = playGameService.saveGame(state.getGame(), state);
+        if (daoMongoService.isSavedGamePresentInMongoDB(state.getGame().getPlayerName() + "SavedGame")) {
+            daoMongoService.cleanSavedGameMongodb(state.getGame().getPlayerName());
+        }
+        daoMongoService.loadSavedGameIntoMongodb(savedGame, state.getGame());
+        sendSavedStateToBeDisplayed(state);
+    }
+
+    @MessageMapping("/restart")
+    public void gameRestart() {
+        if (daoMongoService.isSavedGamePresentInMongoDB(state.getGame().getPlayerName() + "SavedGame")) {
+            state = playGameService.recreateStateFromSavedGame(daoMongoService.loadSavedGameFromMongodb(state.getGame()));
+            state = sendStateToBeDisplayed(state);
+        }
+    }
+
     @MessageMapping("/snapShot")
     public void makeSnapShot() {
         daoMongoService.makeDesktopSnapshot("deskTopSnapShot", state, daoGameService.getBestPlayer(), daoGameService.getBestScore());
@@ -245,6 +269,14 @@ public class TetrisController {
         char[][] cellsToBeDisplayed = state.getStage().drawTetraminoOnCells();
         State stateToBeSent = state.buildState(state.getStage().buildStage(cellsToBeDisplayed), state.isRunning(), state.getGame());
         this.template.convertAndSend("/receive/stateFinal", stateToBeSent);
+        return state;
+    }
+
+    private State sendSavedStateToBeDisplayed(State state) {
+        state = createStateAfterMoveDown(state);
+        char[][] cellsToBeDisplayed = state.getStage().drawTetraminoOnCells();
+        State stateToBeSent = state.buildState(state.getStage().buildStage(cellsToBeDisplayed), state.isRunning(), state.getGame());
+        this.template.convertAndSend("/receive/stateSaved", stateToBeSent);
         return state;
     }
 

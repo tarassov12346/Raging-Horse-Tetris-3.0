@@ -3,6 +3,7 @@ package com.app.game.tetris.serviceImpl;
 import com.app.game.tetris.daoservice.DaoGameService;
 import com.app.game.tetris.daoserviceImpl.DaoGame;
 import com.app.game.tetris.model.Game;
+import com.app.game.tetris.model.SavedGame;
 import com.app.game.tetris.model.Tetramino;
 import com.app.game.tetris.service.GameLogic;
 import com.app.game.tetris.service.PlayGameService;
@@ -28,6 +29,9 @@ public class PlayGame implements PlayGameService {
 
     @Autowired
     private Tetramino tetramino;
+
+    @Autowired
+    private SavedGame savedGame;
 
     @Override
     public Game createGame(String playerName, int playerScore) {
@@ -66,6 +70,18 @@ public class PlayGame implements PlayGameService {
     @Override
     public Optional<State> newTetraminoState(State state) {
         return state.createStateWithNewTetramino();
+    }
+
+    @Override
+    public SavedGame saveGame(Game game, State state) {
+        return savedGame.buildSavedGame(game.getPlayerName(), game.getPlayerScore(), state.getStage().getCells());
+    }
+
+    @Override
+    public State recreateStateFromSavedGame(SavedGame savedGame) {
+        Game recreatedGame = game.buildGame(savedGame.getPlayerName(), savedGame.getPlayerScore());
+        Stage recreatedStage = stage.buildStage(savedGame.getCells(), getTetramino0(), 0, 0, recreatedGame.getPlayerScore() / 10);
+        return state.buildState(recreatedStage, true, recreatedGame).restartWithNewTetramino().orElse(state.buildState(recreatedStage, true, recreatedGame));
     }
 
     private char[][] makeEmptyMatrix() {

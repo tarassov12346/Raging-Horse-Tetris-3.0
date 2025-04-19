@@ -12,7 +12,5 @@ public interface GameLogic <T>{
     T collapseFilledLayers();
     T burryTetramino();
     T initiateTetramino(Tetramino tetramino, int x, int y);
-    void setPause();
-    void unsetPause();
     boolean checkCollision(int dx, int dy, boolean rotate);
 }

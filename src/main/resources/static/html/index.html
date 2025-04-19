@@ -32,6 +32,8 @@
             $("#rotateButton").prop("disabled", connected);
             $("#dropButton").prop("disabled", connected);
             $("#newGameButton").prop("disabled", connected);
+            $("#saveButton").prop("disabled", connected);
+            $("#restartButton").prop("disabled", connected);
         }
 
         function frameHandlerState(frame) {
@@ -47,6 +49,14 @@
             console.log('Connected: ' + frame);
             stompClient.subscribe('/receive/stateFinal', function (state) {
                 showFinalState(state.body);
+            });
+        }
+
+        function frameHandlerSavedState(frame) {
+            setConnected(true);
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/receive/stateSaved', function (state) {
+                showSavedState(state.body);
             });
         }
 
@@ -69,6 +79,8 @@
                 frameHandlerFinalState(frame)
 
                 frameHandlerDaoGame(frame)
+
+                frameHandlerSavedState(frame)
 
                 setConnected(false)
 
@@ -93,6 +105,53 @@
                   '': ''
                 })
             });
+        }
+
+        function save() {
+            stompClient.publish({
+                destination:"/app/save",
+                body: JSON.stringify({
+                  '': ''
+                })
+            });
+        }
+
+        function restart() {
+            stompClient.publish({
+                destination:"/app/restart",
+                body: JSON.stringify({
+                  '': ''
+                })
+            });
+        }
+
+        function showSavedState(state) {
+            var jsonState = JSON.parse(state);
+            var matrix = jsonState['stage']['cells'];
+            var speed = score/10+1;
+            var status = jsonState['running'];
+            if (jsonState['game']['playerScore']> score) {
+            score = jsonState['game']['playerScore'];
+            }
+            $("#playerBox").text(jsonState['game']['playerName']);
+            $("#playerScoreBox").text(score);
+            $("#tetrisSpeedBox").text('TETRIS at speed ' + speed);
+
+            $("#gameStatusBox").text('Game is Saved!!!');
+            playSound('registered_sound');
+
+            for (let i = 0; i < 20; i++) {
+                for (let j = 0; j < 12; j++) {
+                      $("#c"+i+"v"+j).attr("src","http://localhost:8080/img/"+matrix[i][j]+".png");
+                }
+            }
+            $("#leftButton").prop("disabled", true);
+            $("#rightButton").prop("disabled", true);
+            $("#rotateButton").prop("disabled", true);
+            $("#dropButton").prop("disabled", true);
+            $("#saveButton").prop("disabled", true);
+            $("#restartButton").prop("disabled", true);
+            $("#newGameButton").prop("disabled", false);
         }
 
         function showFinalState(state) {
@@ -120,6 +179,8 @@
             $("#rightButton").prop("disabled", true);
             $("#rotateButton").prop("disabled", true);
             $("#dropButton").prop("disabled", true);
+            $("#saveButton").prop("disabled", true);
+            $("#restartButton").prop("disabled", true);
             $("#newGameButton").prop("disabled", false);
         }
 
@@ -145,6 +206,8 @@
             $("#rotateButton").prop("disabled", true);
             $("#dropButton").prop("disabled", true);
             $("#newGameButton").prop("disabled", true);
+            $("#saveButton").prop("disabled", true);
+            $("#restartButton").prop("disabled", true);
 
            playSound('registered_sound');
            }
@@ -189,6 +252,12 @@
             });
             $("#dropButton").click(function () {
                 drop();
+            });
+            $("#saveButton").click(function () {
+                save();
+            });
+            $("#restartButton").click(function () {
+                restart();
             });
         });
 
@@ -580,13 +649,13 @@
 </div>
 
 <div id="controls" align="center">
-    <button id="leftButton" disabled onclick="left()" >Left</button>
-    <button id="rotateButton" disabled onclick="rotate()" >Rotate</button>
-    <button id="dropButton" disabled onclick="drop()" >Drop</button>
+    <button id="leftButton" disabled  >Left</button>
+    <button id="rotateButton" disabled  >Rotate</button>
+    <button id="dropButton" disabled  >Drop</button>
     <button id="newGameButton" disabled>NewGame</button>
-    <button id="saveButton" disabled onclick="save()" >Save</button>
-    <button id="restartButton" disabled onclick="restart()" >Restart</button>
-    <button id="rightButton" disabled onclick="right()" >Right</button>
+    <button id="saveButton" disabled  >Save</button>
+    <button id="restartButton" disabled  >Restart</button>
+    <button id="rightButton" disabled  >Right</button>
 </div>
 
 <audio id="game_sound">

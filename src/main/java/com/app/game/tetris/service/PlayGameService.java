@@ -2,6 +2,7 @@ package com.app.game.tetris.service;
 
 import com.app.game.tetris.daoserviceImpl.DaoGame;
 import com.app.game.tetris.model.Game;
+import com.app.game.tetris.model.SavedGame;
 import com.app.game.tetris.serviceImpl.State;
 
 import java.util.Optional;
@@ -17,4 +18,6 @@ public interface PlayGameService {
     State rotateState(State state);
     Optional<State> moveDownState(State state);
     Optional<State> newTetraminoState(State state);
+    SavedGame saveGame(Game game, State state);
+    State recreateStateFromSavedGame(SavedGame savedGame);
 }
