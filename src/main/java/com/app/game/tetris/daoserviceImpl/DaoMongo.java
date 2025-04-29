@@ -29,8 +29,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -174,17 +177,11 @@ public class DaoMongo implements DaoMongoService {
     }
 
     @Override
-    public void loadMugShotIntoMongodb(String playerName, MultipartFile file) {
+    public void loadMugShotIntoMongodb(String playerName, byte[] data){
         String uri = mongoUri;
         MongoClient mongoClient = MongoClients.create(uri);
         MongoDatabase database = mongoClient.getDatabase("shopDB");
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
-        byte[] data = new byte[0];
-        try {
-            data = file.getBytes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         GridFSUploadOptions options = new GridFSUploadOptions()
                 .chunkSizeBytes(1048576)
                 .metadata(new Document("type", "jpg"));

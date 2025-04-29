@@ -42,6 +42,14 @@
           display: block;
           margin-left: auto;
           margin-right: auto }
+
+          .buttonProfile {
+           font-size: 16px;
+           background-color:#0a0a11;
+           color: #fff;
+          }
+
+
       </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
@@ -55,10 +63,7 @@
  setTimeout(connect,500);
 
         function setConnected(connected) {
-            $("#connect").prop("disabled", connected);
-            $("#connectSockJS").prop("disabled", connected);
-            $("#disconnect").prop("disabled", !connected);
-
+             $("#profileButton").prop("disabled", !connected);
         }
 
         function frameHandlerUsers(frame) {
@@ -150,6 +155,16 @@
         "</tr>");
         }
 
+        function profile() {
+            window.location = "http://localhost:8080/html/profile.html";
+        }
+
+        $(function () {
+            $("#profileButton").click(function () {
+                profile();
+            });
+        });
+
         function sendForAdmin() {
         stompClient.publish({
         destination:"/app/admin",
@@ -191,7 +206,7 @@
         </thead>
 
     </table>
-    <a href="/profile">Return</a>
+    <button id="profileButton" disabled type="button" class="buttonProfile" >Your Profile</button>
 
 </div>
 

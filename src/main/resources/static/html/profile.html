@@ -25,6 +25,8 @@
 
        #forms{text-align: center;}
 
+
+
        img.mugShot {
        display: block;
        margin-left: auto;
@@ -84,9 +86,15 @@
         }
 
         function connect() {
+
+        var wb = new WebSocket("ws://localhost:8080/websocket");
+
+        wb.binaryType = "arraybuffer";
+
+
             stompClient = new window.StompJs.Client({
                 webSocketFactory: function () {
-                    return new WebSocket("ws://localhost:8080/websocket");
+                    return wb;
                 }
             });
             stompClient.onConnect = function (frame) {
@@ -124,7 +132,28 @@
             $("#startGameButton").click(function () {
                 index();
             });
+            $("#uploadButton").click(function () {
+               sendFile();
+            });
         });
+
+         function sendFile() {
+            var file = document.getElementById('filename').files[0];
+            var base64String = "";
+            var reader = new FileReader();
+            reader.onload = function () {
+            base64String = reader.result.replace("data:", "")
+                    .replace(/^.+,/, "");
+            imageBase64Stringsep = base64String;
+            alert("Your avatar has been uploaded!");
+
+               stompClient.publish({
+                destination:"/app/upload",
+                  body:imageBase64Stringsep
+                })
+            }
+            reader.readAsDataURL(file);
+         }
     </script>
 
 </head>
@@ -134,8 +163,24 @@
 <h2 text align="center"> <b id="profileAttemptsBox"> </b> </h2>
 <h3 text align="center"> <b id="profile"> LAST PLAY RESULT ******************YOUR MUGSHOT ****************BEST PLAY RESULT</b> </h3>
 
+
+
+<h2>File Upload</h2>
+Select file
+<input type="file" id="filename" />
+
+
+
+
+
+
 <div id="controls">
     <button id="startGameButton" disabled type="button" class="buttonStart" >Start</button>
+
+    <button id="uploadButton"  type="button" class="buttonUpload" >Upload</button>
+
+
+
 </div>
 
 <img class="mugShot" src="/getPhoto" alt="" width="120" height="120">

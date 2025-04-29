@@ -11,20 +11,29 @@ import com.app.game.tetris.service.PlayGameService;
 import com.app.game.tetris.serviceImpl.State;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.websocket.OnMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.*;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class TetrisController {
@@ -93,13 +102,20 @@ public class TetrisController {
     public void profile() {
         daoGameService.retrievePlayerScores(state.getGame());
 
-        if (!daoMongoService.isImageFilePresentInMongoDB(state.getGame().getPlayerName()))
+        if (!daoMongoService.isImageFilePresentInMongoDB(state.getGame().getPlayerName())) {
             daoMongoService.prepareMongoDBForNewPLayer(state.getGame().getPlayerName());
+        }
 
         this.template.convertAndSend("/receive/playerStat",
                 playGameService.createGame(state.getGame().getPlayerName(), daoGameService.getPlayerBestScore()));
         this.template.convertAndSend("/receive/playerAttemptsNumber",
                 playGameService.createGame("DataTransferObject", daoGameService.getPlayerAttemptsNumber()));
+    }
+
+    @MessageMapping("/upload")
+    public void test(String imageBase64Stringsep) {
+        daoMongoService.cleanImageMongodb(state.getGame().getPlayerName(), "");
+        daoMongoService.loadMugShotIntoMongodb(state.getGame().getPlayerName(), Base64.getDecoder().decode(imageBase64Stringsep));
     }
 
     @GetMapping({"/getPhoto"})
