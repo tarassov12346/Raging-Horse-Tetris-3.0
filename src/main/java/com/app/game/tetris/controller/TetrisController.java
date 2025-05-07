@@ -94,6 +94,11 @@ public class TetrisController {
         state = playGameService.initiateState(principal.getName());
         daoGameService.retrieveScores();
         //  daoMongoService.runMongoServer();
+
+        if (!daoMongoService.isImageFilePresentInMongoDB(state.getGame().getPlayerName())) {
+            daoMongoService.prepareMongoDBForNewPLayer(state.getGame().getPlayerName());
+        }
+
         sendGameToBeDisplayed(state.getGame());
         sendDaoGameToBeDisplayed(playGameService.createGame(daoGameService.getBestPlayer(), daoGameService.getBestScore()));
     }
@@ -102,9 +107,7 @@ public class TetrisController {
     public void profile() {
         daoGameService.retrievePlayerScores(state.getGame());
 
-        if (!daoMongoService.isImageFilePresentInMongoDB(state.getGame().getPlayerName())) {
-            daoMongoService.prepareMongoDBForNewPLayer(state.getGame().getPlayerName());
-        }
+
 
         this.template.convertAndSend("/receive/playerStat",
                 playGameService.createGame(state.getGame().getPlayerName(), daoGameService.getPlayerBestScore()));

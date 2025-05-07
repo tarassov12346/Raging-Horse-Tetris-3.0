@@ -11,10 +11,19 @@
         background-color: rgb(204, 102, 0);
         }
 
-        #controls{text-align: center;}
+        #controls2{text-align: center;}
+        #controls1{text-align: center;}
 
-       .buttonStart {
-        position: absolute;
+       #startGameButton {
+
+        font-size: 16px;
+        top:50%;
+        background-color:#0a0a23;
+        color: #fff;
+        }
+
+        #uploadButton {
+
         font-size: 16px;
         top:50%;
         background-color:#0a0a23;
@@ -23,9 +32,45 @@
 
        #header{text-align: center;}
 
-       #forms{text-align: center;}
+       #forms{text-align: center;font-family: 'Courier New', monospace;font-size: 25px;}
 
-
+       .input-file {
+	position: relative;
+	display: inline-block;
+}
+.input-file-btn {
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+	outline: none;
+	text-decoration: none;
+	font-size: 14px;
+	vertical-align: middle;
+	color: rgb(255 255 255);
+	text-align: center;
+	border-radius: 4px;
+	background-color: #419152;
+	line-height: 22px;
+	height: 40px;
+	padding: 10px 20px;
+	box-sizing: border-box;
+	border: none;
+	margin: 0;
+	transition: background-color 0.2s;
+}
+.input-file-text {
+	padding: 0 10px;
+	line-height: 40px;
+	display: inline-block;
+}
+.input-file input[type=file] {
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
+	display: block;
+	width: 0;
+	height: 0;
+}
 
        img.mugShot {
        display: block;
@@ -162,28 +207,25 @@
 <h1 text align="center"> <b id="profileBox"> </b> </h1>
 <h2 text align="center"> <b id="profileAttemptsBox"> </b> </h2>
 <h3 text align="center"> <b id="profile"> LAST PLAY RESULT ******************YOUR MUGSHOT ****************BEST PLAY RESULT</b> </h3>
-
-
-
-<h2>File Upload</h2>
-Select file
-<input type="file" id="filename" />
-
-
-
-
-
-
-<div id="controls">
-    <button id="startGameButton" disabled type="button" class="buttonStart" >Start</button>
-
+<div id="controls1">
     <button id="uploadButton"  type="button" class="buttonUpload" >Upload</button>
-
-
-
 </div>
+<form id="forms">
+    <label class="input-file">
+        <input type="file" id="filename" name="file">
+        <span class="input-file-btn">Choose your avatar</span>
+        <span class="input-file-text">8 kb max</span>
+    </label>
+</form>
+
+
 
 <img class="mugShot" src="/getPhoto" alt="" width="120" height="120">
+
+<div id="controls2">
+    <button id="startGameButton" disabled type="button" class="buttonStart" >Start</button>
+</div>
+
 <img class="snapShot" src="/getSnapShot" alt="" width="120" height="120">
 <img class="snapShotBest" src="/getSnapShotBest" alt="" width="120" height="120">
 
