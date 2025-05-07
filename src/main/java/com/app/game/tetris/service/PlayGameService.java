@@ -1,6 +1,5 @@
 package com.app.game.tetris.service;
 
-import com.app.game.tetris.daoserviceImpl.DaoGame;
 import com.app.game.tetris.model.Game;
 import com.app.game.tetris.model.SavedGame;
 import com.app.game.tetris.serviceImpl.State;

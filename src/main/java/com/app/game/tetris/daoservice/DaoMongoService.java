@@ -3,7 +3,6 @@ package com.app.game.tetris.daoservice;
 import com.app.game.tetris.model.Game;
 import com.app.game.tetris.model.SavedGame;
 import com.app.game.tetris.serviceImpl.State;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface DaoMongoService {
     void runMongoServer();

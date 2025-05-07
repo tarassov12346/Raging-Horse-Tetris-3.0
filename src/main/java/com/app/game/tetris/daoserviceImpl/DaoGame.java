@@ -3,7 +3,6 @@ package com.app.game.tetris.daoserviceImpl;
 import com.app.game.tetris.daoservice.DaoGameService;
 import com.app.game.tetris.model.Game;
 import com.app.game.tetris.repository.GameRepository;
-import com.app.game.tetris.serviceImpl.State;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
