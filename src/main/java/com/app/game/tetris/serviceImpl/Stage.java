@@ -143,6 +143,11 @@ public class Stage implements StageService {
         )));
     }
 
+    @Override
+    public Stage setTetramino(Tetramino tetramino, int x, int y) {
+        return new Stage(cells, tetramino, x, y, collapsedLayersCount);
+    }
+
     private char[][] rotateMatrix(char[][] m) {
         final int h = m.length;
         final int w = m[0].length;
